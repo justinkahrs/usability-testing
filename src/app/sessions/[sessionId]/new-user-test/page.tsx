@@ -2,18 +2,17 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { useSessions, UserTest } from "@/context/SessionsContext";
+import { useSessions, type UserTest } from "@/context/SessionsContext";
 import {
   Box,
   Button,
   Container,
-  FormControlLabel,
-  Switch,
   TextField,
   Typography,
-  Stack
+  Stack,
 } from "@mui/material";
 import { v4 as uuid } from "uuid";
+import TaskItem from "@/components/TaskItem";
 
 export default function NewUserTestPage() {
   const { sessionId } = useParams();
@@ -81,6 +80,7 @@ export default function NewUserTestPage() {
     router.push(`/sessions/${sessionId}`);
   }
 
+  console.log({ session });
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
       <Typography variant="h5" gutterBottom>
@@ -123,35 +123,14 @@ export default function NewUserTestPage() {
         {session.tasks.map((task) => {
           const current = taskResults[task.id] || { pass: false, comments: "" };
           return (
-            <Box
+            <TaskItem
               key={task.id}
-              sx={{
-                border: "1px solid #ccc",
-                p: 2,
-                borderRadius: 1,
-              }}
-            >
-              <Typography variant="body1" sx={{ mb: 1 }}>
-                {task.description}
-              </Typography>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={current.pass}
-                    onChange={() => handleToggle(task.id)}
-                  />
-                }
-                label="Pass / Fail"
-              />
-              <TextField
-                fullWidth
-                multiline
-                minRows={2}
-                label="Comments"
-                value={current.comments}
-                onChange={(e) => handleCommentsChange(task.id, e.target.value)}
-              />
-            </Box>
+              task={task}
+              passValue={current.pass}
+              commentsValue={current.comments}
+              onToggle={handleToggle}
+              onCommentsChange={handleCommentsChange}
+            />
           );
         })}
       </Stack>

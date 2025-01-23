@@ -2,15 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSessions, TestingTask } from "@/context/SessionsContext";
+import { useSessions, type TestingTask } from "@/context/SessionsContext";
 import {
   Box,
   Button,
   Container,
   TextField,
   Typography,
-  Stack
+  Stack,
 } from "@mui/material";
+import { parseTestingTasks } from "@/utils/parseTestingTasks";
 
 export default function NewSessionPage() {
   const { addSession } = useSessions();
@@ -18,22 +19,14 @@ export default function NewSessionPage() {
   const [sessionName, setSessionName] = useState("");
   const [tasksFile, setTasksFile] = useState<File | null>(null);
 
-  function parseMarkdown(content: string): TestingTask[] {
-    // Basic example of turning each line into a task
-    // In real usage, parse more robustly or use a library
-    const lines = content.split("\n").map((line) => line.trim()).filter(Boolean);
-    return lines.map((description) => ({
-      id: crypto.randomUUID(),
-      description,
-    }));
-  }
+
 
   async function handleCreateSession() {
     if (!sessionName) return;
     let tasks: TestingTask[] = [];
     if (tasksFile) {
       const fileContent = await tasksFile.text();
-      tasks = parseMarkdown(fileContent);
+      tasks = parseTestingTasks(fileContent);
     }
     addSession(sessionName, tasks);
     router.push("/sessions");
