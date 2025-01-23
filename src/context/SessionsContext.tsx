@@ -38,6 +38,11 @@ interface SessionsContextType {
   addSession: (name: string, tasks: TestingTask[]) => void;
   addUserTest: (sessionId: string, userTest: UserTest) => void;
   removeUserTest: (sessionId: string, userTestId: string) => void;
+  updateUserTest: (
+    sessionId: string,
+    userTestId: string,
+    updatedResults: Array<{ taskId: string; pass: boolean; comments: string }>
+  ) => void;
 }
 
 const SessionsContext = react.createContext<SessionsContextType>({
@@ -45,6 +50,7 @@ const SessionsContext = react.createContext<SessionsContextType>({
   addSession: () => {},
   addUserTest: () => {},
   removeUserTest: () => {},
+  updateUserTest: () => {},
 });
 
 export function SessionsProvider({ children }: { children: react.ReactNode }) {
@@ -88,8 +94,29 @@ export function SessionsProvider({ children }: { children: react.ReactNode }) {
     });
   }
 
+  function updateUserTest(
+    sessionId: string,
+    userTestId: string,
+    updatedResults: Array<{ taskId: string; pass: boolean; comments: string }>
+  ) {
+    setSessions((prev) => {
+      return prev.map((session) => {
+        if (session.id !== sessionId) return session;
+        return {
+          ...session,
+          userTests: session.userTests.map((ut) => {
+            if (ut.id !== userTestId) return ut;
+            return { ...ut, taskResults: updatedResults };
+          }),
+        };
+      });
+    });
+  }
+
   return (
-    <SessionsContext.Provider value={{ sessions, addSession, addUserTest, removeUserTest }}>
+    <SessionsContext.Provider
+      value={{ sessions, addSession, addUserTest, removeUserTest, updateUserTest }}
+    >
       {children}
     </SessionsContext.Provider>
   );

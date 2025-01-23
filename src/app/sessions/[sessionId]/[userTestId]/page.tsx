@@ -5,11 +5,18 @@ import { useSessions } from "@/context/SessionsContext";
 import { Box, Button, Container, Typography, Stack } from "@mui/material";
 import BreadcrumbNav from "@/components/BreadcrumbNav";
 import UserTestTaskItem from "@/components/UserTestTaskItem";
+import TaskItem from "@/components/TaskItem";
+import { useState, useEffect } from "react";
 
 export default function UserTestDetailsPage() {
   const { sessionId, userTestId } = useParams();
   const router = useRouter();
-  const { sessions, removeUserTest } = useSessions();
+  const { sessions, removeUserTest, updateUserTest } = useSessions();
+
+  const [editing, setEditing] = useState(false);
+  const [taskResults, setTaskResults] = useState<{
+    [taskId: string]: { pass: boolean; comments: string };
+  }>({});
 
   const session = sessions.find((s) => s.id === sessionId);
 
@@ -40,9 +47,60 @@ export default function UserTestDetailsPage() {
     );
   }
 
+  // Initialize local state from the existing userTest.taskResults
+  useEffect(() => {
+    if (userTest) {
+      const init: { [taskId: string]: { pass: boolean; comments: string } } = {};
+      userTest.taskResults.forEach((t) => {
+        init[t.taskId] = { pass: t.pass, comments: t.comments };
+      });
+      setTaskResults(init);
+    }
+  }, [userTest]);
+
   function handleDelete() {
     removeUserTest(session.id, userTest.id);
     router.push(`/sessions/${session.id}`);
+  }
+
+  function handleToggle(taskId: string) {
+    setTaskResults((prev) => {
+      const oldVal = prev[taskId] || { pass: false, comments: "" };
+      return {
+        ...prev,
+        [taskId]: {
+          ...oldVal,
+          pass: !oldVal.pass,
+        },
+      };
+    });
+  }
+
+  function handleCommentsChange(taskId: string, comments: string) {
+    setTaskResults((prev) => {
+      const oldVal = prev[taskId] || { pass: false, comments: "" };
+      return {
+        ...prev,
+        [taskId]: {
+          ...oldVal,
+          comments,
+        },
+      };
+    });
+  }
+
+  function handleSave() {
+    // Convert our local state into the proper array form
+    const updatedResults = session.tasks.map((task) => {
+      const tr = taskResults[task.id] || { pass: false, comments: "" };
+      return {
+        taskId: task.id,
+        pass: tr.pass,
+        comments: tr.comments,
+      };
+    });
+    updateUserTest(session.id, userTest.id, updatedResults);
+    setEditing(false);
   }
 
   return (
@@ -51,12 +109,8 @@ export default function UserTestDetailsPage() {
         crumbs={[
           { label: "Home", href: "/" },
           { label: "Sessions", href: "/sessions" },
-          session
-            ? { label: session.name, href: `/sessions/${session.id}` }
-            : { label: "Session", href: "/sessions" },
-          userTest
-            ? { label: `${userTest.firstName} ${userTest.lastName}` }
-            : { label: "User Test" },
+          { label: session.name, href: `/sessions/${session.id}` },
+          { label: `${userTest.firstName} ${userTest.lastName}` },
         ]}
       />
       <Container maxWidth="md" sx={{ mt: 4 }}>
@@ -81,30 +135,81 @@ export default function UserTestDetailsPage() {
         <Typography variant="h6" gutterBottom>
           Task Results
         </Typography>
-        <Stack spacing={2}>
-          {session.tasks.map((task) => {
-            const tr = userTest.taskResults.find((t) => t.taskId === task.id);
-            return (
-              <UserTestTaskItem
-                key={task.id}
-                task={task}
-                pass={Boolean(tr?.pass)}
-                comments={tr?.comments || ""}
-              />
-            );
-          })}
-        </Stack>
+
+        {/* Editable vs Read-Only */}
+        {!editing && (
+          <Stack spacing={2}>
+            {session.tasks.map((task) => {
+              const tr = userTest.taskResults.find((t) => t.taskId === task.id);
+              return (
+                <UserTestTaskItem
+                  key={task.id}
+                  task={task}
+                  pass={Boolean(tr?.pass)}
+                  comments={tr?.comments || ""}
+                />
+              );
+            })}
+          </Stack>
+        )}
+
+        {editing && (
+          <Stack spacing={2}>
+            {session.tasks.map((task) => {
+              const current = taskResults[task.id] || {
+                pass: false,
+                comments: "",
+              };
+              return (
+                <TaskItem
+                  key={task.id}
+                  task={task}
+                  passValue={current.pass}
+                  commentsValue={current.comments}
+                  onToggle={handleToggle}
+                  onCommentsChange={handleCommentsChange}
+                />
+              );
+            })}
+          </Stack>
+        )}
 
         <Stack direction="row" spacing={2} sx={{ mt: 4 }}>
-          <Button
-            variant="outlined"
-            onClick={() => router.push(`/sessions/${session.id}`)}
-          >
-            Back
-          </Button>
-          <Button variant="contained" color="error" onClick={handleDelete}>
-            Delete Test
-          </Button>
+          {!editing && (
+            <Button
+              variant="outlined"
+              onClick={() => router.push(`/sessions/${session.id}`)}
+            >
+              Back
+            </Button>
+          )}
+
+          {!editing && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => setEditing(true)}
+            >
+              Edit
+            </Button>
+          )}
+
+          {!editing && (
+            <Button variant="contained" color="error" onClick={handleDelete}>
+              Delete Test
+            </Button>
+          )}
+
+          {editing && (
+            <>
+              <Button variant="outlined" onClick={() => setEditing(false)}>
+                Cancel
+              </Button>
+              <Button variant="contained" color="primary" onClick={handleSave}>
+                Save Changes
+              </Button>
+            </>
+          )}
         </Stack>
       </Container>
     </>

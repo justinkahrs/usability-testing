@@ -71,11 +71,14 @@ export default function NewUserTestPage() {
       title,
       department,
       dateOfTest,
-      taskResults: Object.entries(taskResults).map(([taskId, result]) => ({
-        taskId,
-        pass: result.pass,
-        comments: result.comments,
-      })),
+      taskResults: session.tasks.map((task) => {
+        const tr = taskResults[task.id] || { pass: false, comments: "" };
+        return {
+          taskId: task.id,
+          pass: tr.pass,
+          comments: tr.comments,
+        };
+      }),
     };
     addUserTest(sessionId, userTest);
     router.push(`/sessions/${sessionId}`);
