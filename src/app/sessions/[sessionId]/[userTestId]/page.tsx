@@ -18,6 +18,14 @@ export default function UserTestDetailsPage() {
     [taskId: string]: { pass: boolean; comments: string };
   }>({});
 
+  if (sessions === null) {
+    return (
+      <Box sx={{ p: 2 }}>
+        <Typography variant="h5">Loading sessions...</Typography>
+      </Box>
+    );
+  }
+
   const session = sessions.find((s) => s.id === sessionId);
 
   if (!session) {

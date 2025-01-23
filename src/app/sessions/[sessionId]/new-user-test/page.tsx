@@ -20,6 +20,14 @@ export default function NewUserTestPage() {
   const { sessions, addUserTest } = useSessions();
   const router = useRouter();
 
+  if (sessions === null) {
+    return (
+      <Box sx={{ p: 2 }}>
+        <Typography variant="h5">Loading sessions...</Typography>
+      </Box>
+    );
+  }
+
   const session = sessions.find((s) => s.id === sessionId);
 
   const [firstName, setFirstName] = useState("");

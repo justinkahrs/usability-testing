@@ -16,6 +16,14 @@ export default function SessionsPage() {
   const { sessions } = useSessions();
   const router = useRouter();
 
+  if (sessions === null) {
+    return (
+      <Box sx={{ p: 2 }}>
+        <Typography variant="h5">Loading sessions...</Typography>
+      </Box>
+    );
+  }
+
   return (
     <>
       <BreadcrumbNav

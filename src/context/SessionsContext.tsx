@@ -54,7 +54,29 @@ const SessionsContext = react.createContext<SessionsContextType>({
 });
 
 export function SessionsProvider({ children }: { children: react.ReactNode }) {
-  const [sessions, setSessions] = react.useState<SessionData[]>([]);
+  const [sessions, setSessions] = react.useState<SessionData[] | null>(null);
+
+  // Load sessions from localStorage once on mount
+  react.useEffect(() => {
+    const stored = window.localStorage.getItem("sessions");
+    if (stored) {
+      try {
+        setSessions(JSON.parse(stored));
+      } catch (error) {
+        console.error("Failed to parse localStorage sessions:", error);
+        setSessions([]);
+      }
+    } else {
+      setSessions([]);
+    }
+  }, []);
+
+  // Persist sessions in localStorage whenever they change
+  react.useEffect(() => {
+    if (sessions !== null) {
+      window.localStorage.setItem("sessions", JSON.stringify(sessions));
+    }
+  }, [sessions]);
 
   function addSession(name: string, tasks: TestingTask[]) {
     const newSession: SessionData = {

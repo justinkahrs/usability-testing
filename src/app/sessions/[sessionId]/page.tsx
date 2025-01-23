@@ -17,6 +17,14 @@ export default function SessionDetailsPage() {
   const { sessions, removeUserTest } = useSessions();
   const router = useRouter();
 
+  if (sessions === null) {
+    return (
+      <Box sx={{ p: 2 }}>
+        <Typography variant="h5">Loading sessions...</Typography>
+      </Box>
+    );
+  }
+
   const session = sessions.find((s) => s.id === sessionId);
 
   if (!session) {
