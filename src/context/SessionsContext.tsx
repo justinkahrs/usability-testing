@@ -5,7 +5,11 @@ import { v4 as uuid } from "uuid";
 
 export interface TestingTask {
   id: string;
-  description: string;
+  taskNumber: string;
+  title: string;
+  scenario: string;
+  instructions: string;
+  successCriteria: string;
 }
 
 export interface UserTest {
@@ -33,12 +37,14 @@ interface SessionsContextType {
   sessions: SessionData[];
   addSession: (name: string, tasks: TestingTask[]) => void;
   addUserTest: (sessionId: string, userTest: UserTest) => void;
+  removeUserTest: (sessionId: string, userTestId: string) => void;
 }
 
 const SessionsContext = react.createContext<SessionsContextType>({
   sessions: [],
   addSession: () => {},
   addUserTest: () => {},
+  removeUserTest: () => {},
 });
 
 export function SessionsProvider({ children }: { children: react.ReactNode }) {
@@ -68,8 +74,22 @@ export function SessionsProvider({ children }: { children: react.ReactNode }) {
     });
   }
 
+  function removeUserTest(sessionId: string, userTestId: string) {
+    setSessions((prev) => {
+      return prev.map((session) => {
+        if (session.id === sessionId) {
+          return {
+            ...session,
+            userTests: session.userTests.filter((ut) => ut.id !== userTestId),
+          };
+        }
+        return session;
+      });
+    });
+  }
+
   return (
-    <SessionsContext.Provider value={{ sessions, addSession, addUserTest }}>
+    <SessionsContext.Provider value={{ sessions, addSession, addUserTest, removeUserTest }}>
       {children}
     </SessionsContext.Provider>
   );
