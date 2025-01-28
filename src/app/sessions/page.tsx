@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { useSessions } from "@/context/SessionsContext";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 import {
   Box,
   Button,
@@ -14,7 +16,12 @@ import BreadcrumbNav from "@/components/BreadcrumbNav";
 import AnalysisDialog from "@/components/AnalysisDialog";
 
 export default function SessionsPage() {
-  const { sessions, removeSession, updateSessionAnalysis } = useSessions();
+  const {
+    sessions,
+    removeSession,
+    removeSessionAnalysis,
+    updateSessionAnalysis,
+  } = useSessions();
   const router = useRouter();
   const [analysisDialogOpen, setAnalysisDialogOpen] = useState(false);
   const [analysisToShow, setAnalysisToShow] = useState<any>(null);
@@ -67,32 +74,49 @@ export default function SessionsPage() {
                   <Button
                     variant="outlined"
                     onClick={async () => {
-                      console.log("Sending Session: ", JSON.stringify(session));
                       try {
-                        const resp = await fetch("/api/analysis", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify(session),
-                        });
-                        const data = await resp.json();
+                        const { analysis, ...sessionToSend } = session;
+                        const { data } = await axios.post(
+                          "/api/analysis",
+                          sessionToSend,
+                          {
+                            headers: { "Content-Type": "application/json" },
+                          }
+                        );
                         updateSessionAnalysis(session.id, data);
-                        console.log("Analysis request sent successfully!");
                       } catch (err) {
                         console.error("Error submitting analysis:", err);
                       }
                     }}
                   >
-                    {session.analysis ? "Resubmit for Analysis" : "Submit for Analysis"}
+                    {session.analysis
+                      ? "Resubmit for Analysis"
+                      : "Submit for Analysis"}
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      setAnalysisToShow(session.analysis);
+                      setAnalysisDialogOpen(true);
+                    }}
+                  >
+                    View Analysis
                   </Button>
                   {session.analysis && (
                     <Button
                       variant="outlined"
+                      color="warning"
                       onClick={() => {
-                        setAnalysisToShow(session.analysis);
-                        setAnalysisDialogOpen(true);
+                        if (
+                          window.confirm(
+                            "Are you sure you want to delete the analysis?"
+                          )
+                        ) {
+                          removeSessionAnalysis(session.id);
+                        }
                       }}
                     >
-                      View Analysis
+                      Delete Analysis
                     </Button>
                   )}
                   <Button

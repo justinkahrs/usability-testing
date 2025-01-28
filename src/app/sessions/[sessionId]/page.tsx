@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import axios from "axios";
 import { useRouter, useParams } from "next/navigation";
 import { useSessions } from "@/context/SessionsContext";
 import {
@@ -75,13 +76,15 @@ export default function SessionDetailsPage() {
             variant="outlined"
             onClick={async () => {
               try {
-                const resp = await fetch("/api/analysis", {
-                  method: "POST",
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const { analysis, ...sessionToSend } = session;
+                const {
+                  data: { responseData },
+                } = await axios.post("/api/analysis", sessionToSend, {
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(session),
                 });
-                const data = await resp.json();
-                updateSessionAnalysis(session.id, data);
+                console.warn("response: ", responseData);
+                updateSessionAnalysis(session.id, responseData);
                 console.log("Analysis request sent successfully!");
               } catch (err) {
                 console.error("Error submitting analysis:", err);
@@ -91,12 +94,29 @@ export default function SessionDetailsPage() {
             {session.analysis ? "Resubmit for Analysis" : "Submit for Analysis"}
           </Button>
           {session.analysis && (
-            <Button
-              variant="outlined"
-              onClick={() => setAnalysisDialogOpen(true)}
-            >
-              View Analysis
-            </Button>
+            <>
+              <Button
+                variant="outlined"
+                onClick={() => setAnalysisDialogOpen(true)}
+              >
+                View Analysis
+              </Button>
+              <Button
+                variant="outlined"
+                color="warning"
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      "Are you sure you want to delete the analysis?"
+                    )
+                  ) {
+                    removeSessionAnalysis(session.id);
+                  }
+                }}
+              >
+                Delete Analysis
+              </Button>
+            </>
           )}
           <Button
             variant="outlined"

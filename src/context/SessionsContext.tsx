@@ -1,6 +1,6 @@
 "use client";
 
-import react from "react";
+import react, { useEffect, useState } from "react";
 import { v4 as uuid } from "uuid";
 
 export interface TestingTask {
@@ -26,16 +26,18 @@ export interface UserTest {
   }>;
 }
 
+export type Analysis = Record<string, unknown>;
+
 export type Session = {
   id: string;
   name: string;
   tasks: TestingTask[];
   userTests: UserTest[];
-  analysis?: any;
+  analysis?: Analysis;
 };
 
 interface SessionsContextType {
-  sessions: SessionData[];
+  sessions: Session[];
   addSession: (name: string, tasks: TestingTask[]) => void;
   addUserTest: (sessionId: string, userTest: UserTest) => void;
   removeUserTest: (sessionId: string, userTestId: string) => void;
@@ -45,6 +47,8 @@ interface SessionsContextType {
     updatedResults: Array<{ taskId: string; pass: boolean; comments: string }>
   ) => void;
   removeSession: (sessionId: string) => void;
+  removeSessionAnalysis: (sessionId: string) => void;
+  updateSessionAnalysis: (sessionId: string, analysis: Analysis) => void;
 }
 
 const SessionsContext = react.createContext<SessionsContextType>({
@@ -54,46 +58,46 @@ const SessionsContext = react.createContext<SessionsContextType>({
   removeUserTest: () => {},
   updateUserTest: () => {},
   removeSession: () => {},
+  removeSessionAnalysis: () => {},
+  updateSessionAnalysis: () => {},
 });
 
 export function SessionsProvider({ children }: { children: react.ReactNode }) {
-  const [sessions, setSessions] = react.useState<SessionData[] | null>(null);
+  const [sessions, setSessions] = useState<Session[]>([]);
 
   // Load sessions from localStorage once on mount
-  react.useEffect(() => {
+  useEffect(() => {
     const stored = window.localStorage.getItem("sessions");
     if (stored) {
       try {
-        setSessions(JSON.parse(stored));
+        const parsed = JSON.parse(stored) as Session[];
+        setSessions(parsed);
       } catch (error) {
         console.error("Failed to parse localStorage sessions:", error);
         setSessions([]);
       }
-    } else {
-      setSessions([]);
     }
   }, []);
 
   // Persist sessions in localStorage whenever they change
-  react.useEffect(() => {
-    if (sessions !== null) {
-      window.localStorage.setItem("sessions", JSON.stringify(sessions));
-    }
+  useEffect(() => {
+    // sessions is always an array, so we can just stringify
+    window.localStorage.setItem("sessions", JSON.stringify(sessions));
   }, [sessions]);
 
   function addSession(name: string, tasks: TestingTask[]) {
-    const newSession: SessionData = {
+    const newSession: Session = {
       id: uuid(),
       name,
       tasks,
       userTests: [],
     };
-    setSessions((prev) => [...prev, newSession]);
+    setSessions((prevSessions) => [...prevSessions, newSession]);
   }
 
   function addUserTest(sessionId: string, userTest: UserTest) {
-    setSessions((prev) => {
-      return prev.map((session) => {
+    setSessions((prevSessions) =>
+      prevSessions.map((session) => {
         if (session.id === sessionId) {
           return {
             ...session,
@@ -101,22 +105,24 @@ export function SessionsProvider({ children }: { children: react.ReactNode }) {
           };
         }
         return session;
-      });
-    });
+      })
+    );
   }
 
   function removeUserTest(sessionId: string, userTestId: string) {
-    setSessions((prev) => {
-      return prev.map((session) => {
+    setSessions((prevSessions) =>
+      prevSessions.map((session) => {
         if (session.id === sessionId) {
           return {
             ...session,
-            userTests: session.userTests.filter((ut) => ut.id !== userTestId),
+            userTests: session.userTests.filter(
+              (ut: UserTest) => ut.id !== userTestId
+            ),
           };
         }
         return session;
-      });
-    });
+      })
+    );
   }
 
   function updateUserTest(
@@ -124,32 +130,40 @@ export function SessionsProvider({ children }: { children: react.ReactNode }) {
     userTestId: string,
     updatedResults: Array<{ taskId: string; pass: boolean; comments: string }>
   ) {
-    setSessions((prev) => {
-      return prev.map((session) => {
+    setSessions((prevSessions) =>
+      prevSessions.map((session) => {
         if (session.id !== sessionId) return session;
         return {
           ...session,
-          userTests: session.userTests.map((ut) => {
+          userTests: session.userTests.map((ut: UserTest) => {
             if (ut.id !== userTestId) return ut;
             return { ...ut, taskResults: updatedResults };
           }),
         };
-      });
-    });
+      })
+    );
   }
 
   function removeSession(sessionId: string) {
-const updated = sessions.filter((s) => s.id !== sessionId);
-setSessions(updated);
+    setSessions((prevSessions) =>
+      prevSessions.filter((s) => s.id !== sessionId)
+    );
   }
-  
-  function updateSessionAnalysis(sessionId: string, analysis: any) {
-setSessions((prev) =>
-prev.map((s) =>
-s.id === sessionId ? { ...s, analysis } : s
-)
-);
+
+  function removeSessionAnalysis(sessionId: string) {
+    setSessions((prevSessions) =>
+      prevSessions.map((s) =>
+        s.id === sessionId ? { ...s, analysis: undefined } : s
+      )
+    );
   }
+
+  function updateSessionAnalysis(sessionId: string, analysis: Analysis) {
+    setSessions((prevSessions) =>
+      prevSessions.map((s) => (s.id === sessionId ? { ...s, analysis } : s))
+    );
+  }
+
   return (
     <SessionsContext.Provider
       value={{
@@ -159,6 +173,8 @@ s.id === sessionId ? { ...s, analysis } : s
         removeUserTest,
         updateUserTest,
         removeSession,
+        removeSessionAnalysis,
+        updateSessionAnalysis,
       }}
     >
       {children}
