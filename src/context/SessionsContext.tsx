@@ -26,12 +26,13 @@ export interface UserTest {
   }>;
 }
 
-export interface SessionData {
+export type Session = {
   id: string;
   name: string;
   tasks: TestingTask[];
   userTests: UserTest[];
-}
+  analysis?: any;
+};
 
 interface SessionsContextType {
   sessions: SessionData[];
@@ -138,9 +139,17 @@ export function SessionsProvider({ children }: { children: react.ReactNode }) {
   }
 
   function removeSession(sessionId: string) {
-    setSessions((prev) => prev.filter((session) => session.id !== sessionId));
+const updated = sessions.filter((s) => s.id !== sessionId);
+setSessions(updated);
   }
-
+  
+  function updateSessionAnalysis(sessionId: string, analysis: any) {
+setSessions((prev) =>
+prev.map((s) =>
+s.id === sessionId ? { ...s, analysis } : s
+)
+);
+  }
   return (
     <SessionsContext.Provider
       value={{

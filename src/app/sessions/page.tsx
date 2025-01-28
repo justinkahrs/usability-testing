@@ -11,10 +11,13 @@ import {
   Stack,
 } from "@mui/material";
 import BreadcrumbNav from "@/components/BreadcrumbNav";
+import AnalysisDialog from "@/components/AnalysisDialog";
 
 export default function SessionsPage() {
-  const { sessions, removeSession } = useSessions();
+  const { sessions, removeSession, updateSessionAnalysis } = useSessions();
   const router = useRouter();
+  const [analysisDialogOpen, setAnalysisDialogOpen] = useState(false);
+  const [analysisToShow, setAnalysisToShow] = useState<any>(null);
 
   if (sessions === null) {
     return (
@@ -66,19 +69,32 @@ export default function SessionsPage() {
                     onClick={async () => {
                       console.log("Sending Session: ", JSON.stringify(session));
                       try {
-                        await fetch("/api/analysis", {
+                        const resp = await fetch("/api/analysis", {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify(session),
                         });
+                        const data = await resp.json();
+                        updateSessionAnalysis(session.id, data);
                         console.log("Analysis request sent successfully!");
                       } catch (err) {
                         console.error("Error submitting analysis:", err);
                       }
                     }}
                   >
-                    Submit for Analysis
+                    {session.analysis ? "Resubmit for Analysis" : "Submit for Analysis"}
                   </Button>
+                  {session.analysis && (
+                    <Button
+                      variant="outlined"
+                      onClick={() => {
+                        setAnalysisToShow(session.analysis);
+                        setAnalysisDialogOpen(true);
+                      }}
+                    >
+                      View Analysis
+                    </Button>
+                  )}
                   <Button
                     variant="outlined"
                     color="error"
@@ -103,6 +119,11 @@ export default function SessionsPage() {
           )}
         </Stack>
       </Box>
+      <AnalysisDialog
+        open={analysisDialogOpen}
+        onClose={() => setAnalysisDialogOpen(false)}
+        analysis={analysisToShow}
+      />
     </>
   );
 }

@@ -1,5 +1,5 @@
 "use client";
-
+import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useSessions } from "@/context/SessionsContext";
 import {
@@ -11,11 +11,14 @@ import {
   Stack,
 } from "@mui/material";
 import BreadcrumbNav from "@/components/BreadcrumbNav";
+import AnalysisDialog from "@/components/AnalysisDialog";
 
 export default function SessionDetailsPage() {
   const { sessionId } = useParams();
-  const { sessions, removeSession, removeUserTest } = useSessions();
+  const { sessions, removeSession, removeUserTest, updateSessionAnalysis } =
+    useSessions();
   const router = useRouter();
+  const [analysisDialogOpen, setAnalysisDialogOpen] = useState(false);
 
   if (sessions === null) {
     return (
@@ -72,19 +75,29 @@ export default function SessionDetailsPage() {
             variant="outlined"
             onClick={async () => {
               try {
-                await fetch("/api/analysis", {
+                const resp = await fetch("/api/analysis", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify(session),
                 });
+                const data = await resp.json();
+                updateSessionAnalysis(session.id, data);
                 console.log("Analysis request sent successfully!");
               } catch (err) {
                 console.error("Error submitting analysis:", err);
               }
             }}
           >
-            Submit for Analysis
+            {session.analysis ? "Resubmit for Analysis" : "Submit for Analysis"}
           </Button>
+          {session.analysis && (
+            <Button
+              variant="outlined"
+              onClick={() => setAnalysisDialogOpen(true)}
+            >
+              View Analysis
+            </Button>
+          )}
           <Button
             variant="outlined"
             color="error"
@@ -101,6 +114,11 @@ export default function SessionDetailsPage() {
             Delete Session
           </Button>
         </Stack>
+        <AnalysisDialog
+          open={analysisDialogOpen}
+          onClose={() => setAnalysisDialogOpen(false)}
+          analysis={session.analysis}
+        />
 
         <Stack spacing={2}>
           {session.userTests.map((ut) => (
