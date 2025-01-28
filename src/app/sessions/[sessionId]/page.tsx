@@ -14,7 +14,7 @@ import BreadcrumbNav from "@/components/BreadcrumbNav";
 
 export default function SessionDetailsPage() {
   const { sessionId } = useParams();
-  const { sessions, removeUserTest } = useSessions();
+  const { sessions, removeSession, removeUserTest } = useSessions();
   const router = useRouter();
 
   if (sessions === null) {
@@ -61,13 +61,46 @@ export default function SessionDetailsPage() {
         <Typography variant="subtitle1" sx={{ mb: 2 }}>
           {session.tasks.length} task(s)
         </Typography>
-        <Button
-          variant="contained"
-          sx={{ mb: 3 }}
-          onClick={() => router.push(`/sessions/${session.id}/new-user-test`)}
-        >
-          Add New User Test
-        </Button>
+        <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
+          <Button
+            variant="contained"
+            onClick={() => router.push(`/sessions/${session.id}/new-user-test`)}
+          >
+            Add New User Test
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={async () => {
+              try {
+                await fetch("/api/analysis", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(session),
+                });
+                console.log("Analysis request sent successfully!");
+              } catch (err) {
+                console.error("Error submitting analysis:", err);
+              }
+            }}
+          >
+            Submit for Analysis
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={() => {
+              // Confirm deletion
+              if (
+                window.confirm("Are you sure you want to delete this session?")
+              ) {
+                removeSession(session.id);
+                router.push("/sessions");
+              }
+            }}
+          >
+            Delete Session
+          </Button>
+        </Stack>
 
         <Stack spacing={2}>
           {session.userTests.map((ut) => (

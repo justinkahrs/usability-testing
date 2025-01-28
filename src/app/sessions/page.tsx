@@ -13,7 +13,7 @@ import {
 import BreadcrumbNav from "@/components/BreadcrumbNav";
 
 export default function SessionsPage() {
-  const { sessions } = useSessions();
+  const { sessions, removeSession } = useSessions();
   const router = useRouter();
 
   if (sessions === null) {
@@ -45,8 +45,7 @@ export default function SessionsPage() {
             <Card
               key={session.id}
               variant="outlined"
-              onClick={() => router.push(`/sessions/${session.id}`)}
-              sx={{ cursor: "pointer", ":hover": { boxShadow: 2 } }}
+              sx={{ ":hover": { boxShadow: 2 } }}
             >
               <CardContent>
                 <Typography variant="h6">{session.name}</Typography>
@@ -54,6 +53,48 @@ export default function SessionsPage() {
                   {session.tasks.length} tasks - {session.userTests.length} user
                   tests
                 </Typography>
+
+                <Stack direction="row" spacing={1} mt={2}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => router.push(`/sessions/${session.id}`)}
+                  >
+                    View
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={async () => {
+                      console.log("Sending Session: ", JSON.stringify(session));
+                      try {
+                        await fetch("/api/analysis", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify(session),
+                        });
+                        console.log("Analysis request sent successfully!");
+                      } catch (err) {
+                        console.error("Error submitting analysis:", err);
+                      }
+                    }}
+                  >
+                    Submit for Analysis
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          "Are you sure you want to delete this session?"
+                        )
+                      ) {
+                        removeSession(session.id);
+                      }
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </Stack>
               </CardContent>
             </Card>
           ))}

@@ -43,6 +43,7 @@ interface SessionsContextType {
     userTestId: string,
     updatedResults: Array<{ taskId: string; pass: boolean; comments: string }>
   ) => void;
+  removeSession: (sessionId: string) => void;
 }
 
 const SessionsContext = react.createContext<SessionsContextType>({
@@ -51,6 +52,7 @@ const SessionsContext = react.createContext<SessionsContextType>({
   addUserTest: () => {},
   removeUserTest: () => {},
   updateUserTest: () => {},
+  removeSession: () => {},
 });
 
 export function SessionsProvider({ children }: { children: react.ReactNode }) {
@@ -135,9 +137,20 @@ export function SessionsProvider({ children }: { children: react.ReactNode }) {
     });
   }
 
+  function removeSession(sessionId: string) {
+    setSessions((prev) => prev.filter((session) => session.id !== sessionId));
+  }
+
   return (
     <SessionsContext.Provider
-      value={{ sessions, addSession, addUserTest, removeUserTest, updateUserTest }}
+      value={{
+        sessions,
+        addSession,
+        addUserTest,
+        removeUserTest,
+        updateUserTest,
+        removeSession,
+      }}
     >
       {children}
     </SessionsContext.Provider>

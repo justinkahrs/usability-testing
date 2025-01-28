@@ -92,7 +92,6 @@ export default function NewUserTestPage() {
     router.push(`/sessions/${sessionId}`);
   }
 
-  console.log({ session });
   return (
     <>
       <BreadcrumbNav
