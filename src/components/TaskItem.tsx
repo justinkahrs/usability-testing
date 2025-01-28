@@ -52,13 +52,14 @@ export default function TaskItem({
           </Typography>
         )}
 
-        <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
-          <FormControlLabel
-            control={
-              <Switch checked={passValue} onChange={() => onToggle(task.id)} />
-            }
-            label="Pass / Fail"
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+          <Typography>Fail</Typography>
+          <Switch
+            checked={passValue}
+            onChange={() => onToggle(task.id)}
+            color={passValue ? "success" : "error"}
           />
+          <Typography>Pass</Typography>
         </Stack>
 
         <TextField

@@ -44,7 +44,7 @@ interface SessionsContextType {
   updateUserTest: (
     sessionId: string,
     userTestId: string,
-    updatedResults: Array<{ taskId: string; pass: boolean; comments: string }>
+    updatedUserTest: UserTest
   ) => void;
   removeSession: (sessionId: string) => void;
   removeSessionAnalysis: (sessionId: string) => void;
@@ -128,7 +128,7 @@ export function SessionsProvider({ children }: { children: react.ReactNode }) {
   function updateUserTest(
     sessionId: string,
     userTestId: string,
-    updatedResults: Array<{ taskId: string; pass: boolean; comments: string }>
+    updatedUserTest: UserTest
   ) {
     setSessions((prevSessions) =>
       prevSessions.map((session) => {
@@ -137,7 +137,7 @@ export function SessionsProvider({ children }: { children: react.ReactNode }) {
           ...session,
           userTests: session.userTests.map((ut: UserTest) => {
             if (ut.id !== userTestId) return ut;
-            return { ...ut, taskResults: updatedResults };
+            return updatedUserTest;
           }),
         };
       })

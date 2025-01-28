@@ -76,14 +76,12 @@ export default function SessionsPage() {
                     onClick={async () => {
                       try {
                         const { analysis, ...sessionToSend } = session;
-                        const { data } = await axios.post(
-                          "/api/analysis",
-                          sessionToSend,
-                          {
-                            headers: { "Content-Type": "application/json" },
-                          }
-                        );
-                        updateSessionAnalysis(session.id, data);
+                        const {
+                          data: { responseData },
+                        } = await axios.post("/api/analysis", sessionToSend, {
+                          headers: { "Content-Type": "application/json" },
+                        });
+                        updateSessionAnalysis(session.id, responseData);
                       } catch (err) {
                         console.error("Error submitting analysis:", err);
                       }

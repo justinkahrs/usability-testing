@@ -3,13 +3,16 @@
 import type { ReactNode } from "react";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { SessionsProvider } from "@/context/SessionsContext";
+import { LoadingProvider } from "@/context/LoadingContext";
 import theme from "@/theme";
 
-export default function Providers({ children }: { children: ReactNode }) {
+export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <SessionsProvider>{children}</SessionsProvider>
-    </ThemeProvider>
+    <LoadingProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <SessionsProvider>{children}</SessionsProvider>
+      </ThemeProvider>
+    </LoadingProvider>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Providers from "./Providers";
+import GlobalLoadingOverlay from "@/components/GlobalLoadingOverlay";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -26,8 +27,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <Providers>{children}</Providers>
-      </body>
+         <Providers>
+         <GlobalLoadingOverlay />
+         {children}
+         </Providers>
+        </body>
     </html>
   );
 }
