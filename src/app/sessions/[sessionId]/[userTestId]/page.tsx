@@ -15,6 +15,7 @@ import UserTestTaskItem from "@/components/UserTestTaskItem";
 import TaskItem from "@/components/TaskItem";
 import { useState, useEffect } from "react";
 import RichTextInput from "@/components/RichTextInput";
+import TaskCarousel from "@/components/TaskCarousel";
 
 export default function UserTestDetailsPage() {
   const { sessionId, userTestId } = useParams();
@@ -26,6 +27,8 @@ export default function UserTestDetailsPage() {
     [taskId: string]: { pass: boolean; comments: string };
   }>({});
   const [generalComments, setGeneralComments] = useState("");
+  const [viewMode, setViewMode] = useState<"list" | "carousel">("list");
+  const [allTasksViewed, setAllTasksViewed] = useState(true);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -222,27 +225,44 @@ export default function UserTestDetailsPage() {
         <Typography variant="h6" gutterBottom>
           Task Results
         </Typography>
+        <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+          <Typography>View tasks as:</Typography>
+          <Button
+            variant={viewMode === "carousel" ? "contained" : "outlined"}
+            onClick={() => {
+              setViewMode("carousel");
+              setAllTasksViewed(false);
+            }}
+          >
+            Carousel
+          </Button>
+          <Button
+            variant={viewMode === "list" ? "contained" : "outlined"}
+            onClick={() => {
+              setViewMode("list");
+              setAllTasksViewed(true);
+            }}
+          >
+            List
+          </Button>
+        </Stack>
 
-        {/* Editable vs Read-Only */}
-        {!editing && (
+        {viewMode === "list" && (
           <Stack spacing={2}>
             {session.tasks.map((task) => {
-              const tr = userTest.taskResults.find((t) => t.taskId === task.id);
-              return (
-                <UserTestTaskItem
-                  key={task.id}
-                  task={task}
-                  pass={Boolean(tr?.pass)}
-                  comments={tr?.comments || ""}
-                />
-              );
-            })}
-          </Stack>
-        )}
-
-        {editing && (
-          <Stack spacing={2}>
-            {session.tasks.map((task) => {
+              if (!editing) {
+                const tr = userTest.taskResults.find(
+                  (t) => t.taskId === task.id
+                );
+                return (
+                  <UserTestTaskItem
+                    key={task.id}
+                    task={task}
+                    pass={Boolean(tr?.pass)}
+                    comments={tr?.comments || ""}
+                  />
+                );
+              }
               const current = taskResults[task.id] || {
                 pass: false,
                 comments: "",
@@ -258,6 +278,19 @@ export default function UserTestDetailsPage() {
                 />
               );
             })}
+          </Stack>
+        )}
+
+        {viewMode === "carousel" && (
+          <Stack spacing={2}>
+            <TaskCarousel
+              tasks={session.tasks}
+              taskResults={taskResults}
+              onToggle={handleToggle}
+              onCommentsChange={handleCommentsChange}
+              onAllViewedChange={setAllTasksViewed}
+              readOnly={!editing}
+            />
           </Stack>
         )}
 
@@ -306,7 +339,12 @@ export default function UserTestDetailsPage() {
               <Button variant="outlined" onClick={() => setEditing(false)}>
                 Cancel
               </Button>
-              <Button variant="contained" color="primary" onClick={handleSave}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSave}
+                disabled={viewMode === "carousel" && !allTasksViewed}
+              >
                 Save Changes
               </Button>
             </>

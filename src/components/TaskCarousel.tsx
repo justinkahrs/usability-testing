@@ -7,6 +7,7 @@ import ArrowForwardIos from "@mui/icons-material/ArrowForwardIos";
 // import { TransitionGroup, CSSTransition } from "react-transition-group";
 import TaskItem from "./TaskItem";
 import type { TestingTask } from "@/context/SessionsContext";
+import UserTestTaskItem from "./UserTestTaskItem";
 
 interface TaskCarouselProps {
   tasks: TestingTask[];
@@ -14,9 +15,11 @@ interface TaskCarouselProps {
   onToggle: (taskId: string) => void;
   onCommentsChange: (taskId: string, comments: string) => void;
   onAllViewedChange?: (allViewed: boolean) => void;
+  readOnly?: boolean;
 }
 
 export default function TaskCarousel({
+  readOnly,
   tasks,
   taskResults,
   onToggle,
@@ -79,13 +82,23 @@ export default function TaskCarousel({
                 ref={getNodeRef(currentTask.id)}
                 sx={{ width: "100%", position: "absolute" }}
               > */}
-          <TaskItem
-            task={currentTask}
-            passValue={currentResult.pass}
-            commentsValue={currentResult.comments}
-            onToggle={onToggle}
-            onCommentsChange={onCommentsChange}
-          />
+          {readOnly ? (
+            <UserTestTaskItem
+              key={currentTask.id}
+              task={currentTask}
+              pass={currentResult.pass}
+              comments={currentResult.comments}
+            />
+          ) : (
+            <TaskItem
+              key={currentTask.id}
+              task={currentTask}
+              passValue={currentResult.pass}
+              commentsValue={currentResult.comments}
+              onToggle={onToggle}
+              onCommentsChange={onCommentsChange}
+            />
+          )}
           {/* </Box>
             </CSSTransition>
           </TransitionGroup> */}
