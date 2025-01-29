@@ -1,6 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import type React from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
 
 interface LoadingContextProps {
@@ -21,12 +22,12 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
 
   // Called when a request starts
   function increment() {
-    setRequestCount(prev => prev + 1);
+    setRequestCount((prev) => prev + 1);
   }
 
   // Called when a request finishes
   function decrement() {
-    setRequestCount(prev => (prev > 0 ? prev - 1 : 0));
+    setRequestCount((prev) => (prev > 0 ? prev - 1 : 0));
   }
 
   useEffect(() => {

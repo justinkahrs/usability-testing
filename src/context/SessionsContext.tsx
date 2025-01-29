@@ -1,7 +1,9 @@
 "use client";
 
-import react, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { v4 as uuid } from "uuid";
+import axios from "axios";
+import { useLoading } from "./LoadingContext";
 
 export interface TestingTask {
   id: string;
@@ -59,7 +61,7 @@ interface SessionsContextType {
   updateSessionAnalysis: (sessionId: string, analysis: Analysis) => void;
 }
 
-const SessionsContext = react.createContext<SessionsContextType>({
+const SessionsContext = React.createContext<SessionsContextType>({
   sessions: [],
   addSession: () => {},
   addUserTest: () => {},
@@ -70,9 +72,9 @@ const SessionsContext = react.createContext<SessionsContextType>({
   updateSessionAnalysis: () => {},
 });
 
-export function SessionsProvider({ children }: { children: react.ReactNode }) {
+export function SessionsProvider({ children }: { children: React.ReactNode }) {
   const [sessions, setSessions] = useState<Session[]>([]);
-
+  const { increment, decrement } = useLoading();
   // Load sessions from localStorage once on mount
   useEffect(() => {
     const stored = window.localStorage.getItem("sessions");
@@ -168,10 +170,18 @@ export function SessionsProvider({ children }: { children: react.ReactNode }) {
     );
   }
 
-  function updateSessionAnalysis(sessionId: string, analysis: Analysis) {
-    setSessions((prevSessions) =>
-      prevSessions.map((s) => (s.id === sessionId ? { ...s, analysis } : s))
-    );
+  async function updateSessionAnalysis(sessionId: string, analysis: Analysis) {
+    increment();
+    try {
+      await axios.post("/api/analysis", { sessionId, analysis });
+      setSessions((p) =>
+        p.map((s) => (s.id === sessionId ? { ...s, analysis } : s))
+      );
+    } catch (err) {
+      console.error("Analysis submission error:", err);
+    } finally {
+      decrement();
+    }
   }
 
   return (
@@ -193,5 +203,5 @@ export function SessionsProvider({ children }: { children: react.ReactNode }) {
 }
 
 export function useSessions() {
-  return react.useContext(SessionsContext);
+  return React.useContext(SessionsContext);
 }
