@@ -1,18 +1,31 @@
 "use client";
 
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Stack, Box } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Typography,
+  Stack,
+  Box,
+} from "@mui/material";
 
 interface AnalysisDialogProps {
+  title?: string;
   open: boolean;
   onClose: () => void;
-  analysis: {
-    overallPassRate?: string; // "85.71%" for example
-    tasks?: Array<{
-      taskId: string;
-      title: string;
-      passRate: string; // "100.00%"
-    }>;
-  } | null;
+  analysis:
+    | {
+        overallPassRate?: string; // "85.71%" for example
+        tasks?: Array<{
+          taskId: string;
+          title: string;
+          passRate: string; // "100.00%"
+        }>;
+      }
+    | null
+    | undefined;
 }
 
 function getLetterGrade(percentage: number): { letter: string; color: string } {
@@ -50,11 +63,16 @@ function getLetterGrade(percentage: number): { letter: string; color: string } {
   return { letter, color };
 }
 
-export default function AnalysisDialog({ open, onClose, analysis }: AnalysisDialogProps) {
+export default function AnalysisDialog({
+  title,
+  open,
+  onClose,
+  analysis,
+}: AnalysisDialogProps) {
   if (!analysis) {
     return (
       <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-        <DialogTitle>Analysis</DialogTitle>
+        <DialogTitle>{`${title} Analysis`}</DialogTitle>
         <DialogContent>
           <Typography>No analysis data</Typography>
         </DialogContent>
@@ -67,12 +85,14 @@ export default function AnalysisDialog({ open, onClose, analysis }: AnalysisDial
 
   const { overallPassRate, tasks } = analysis;
   // Convert "85.71%" to 85.71
-  const numericPassRate = overallPassRate ? parseFloat(overallPassRate.replace("%", "")) : 0;
+  const numericPassRate = overallPassRate
+    ? parseFloat(overallPassRate.replace("%", ""))
+    : 0;
   const { letter, color } = getLetterGrade(numericPassRate);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>Analysis</DialogTitle>
+      <DialogTitle>{`${title} Analysis`}</DialogTitle>
       <DialogContent>
         {/* Overall Pass Rate with Letter Grade */}
         <Box sx={{ mb: 2 }}>
@@ -88,11 +108,16 @@ export default function AnalysisDialog({ open, onClose, analysis }: AnalysisDial
         {tasks && tasks.length > 0 ? (
           <Stack spacing={2}>
             {tasks.map((task) => (
-              <Box key={task.taskId} sx={{ p: 2, border: "1px solid #ddd", borderRadius: 1 }}>
+              <Box
+                key={task.taskId}
+                sx={{ p: 2, border: "1px solid #ddd", borderRadius: 1 }}
+              >
                 <Typography variant="subtitle1" fontWeight="bold">
                   {task.title}
                 </Typography>
-                <Typography variant="body2">Pass Rate: {task.passRate}</Typography>
+                <Typography variant="body2">
+                  Pass Rate: {task.passRate}
+                </Typography>
               </Box>
             ))}
           </Stack>

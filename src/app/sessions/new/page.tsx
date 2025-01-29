@@ -49,12 +49,12 @@ User successfully uses the website navigation by going to **Services > Process I
       const nameFromMarkdown = headingMatch ? headingMatch[1].trim() : "";
       const finalSessionName = sessionName || nameFromMarkdown;
       tasks = parseTestingTasks(fileContent);
-      addSession(finalSessionName, tasks);
-      router.push("/sessions");
+      const sessionId = addSession(finalSessionName, tasks);
+      router.push(`/sessions/${sessionId}`);
     } else if (mdText.trim()) {
       tasks = parseTestingTasks(mdText);
-      addSession(sessionName, tasks);
-      router.push("/sessions");
+      const sessionId = addSession(sessionName, tasks);
+      router.push(`/sessions/${sessionId}`);
     }
   }
 

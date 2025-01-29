@@ -16,12 +16,12 @@ export default function SessionAnalysisActions({
   session,
   removeSession,
   removeSessionAnalysis,
-  updateSessionAnalysis
+  updateSessionAnalysis,
 }: Props) {
   const [confirmDialog, setConfirmDialog] = useState({
     open: false,
     message: "",
-    onConfirm: () => {}
+    onConfirm: () => {},
   });
   const [open, setOpen] = useState(false);
 
@@ -39,26 +39,26 @@ export default function SessionAnalysisActions({
   }
 
   function handleDeleteAnalysis() {
-  setConfirmDialog({
-    open: true,
-    message: "Are you sure you want to delete the analysis?",
-    onConfirm: () => {
-      removeSessionAnalysis(session.id);
-      setConfirmDialog((prev) => ({ ...prev, open: false }));
-    }
-  });
-}
+    setConfirmDialog({
+      open: true,
+      message: "Are you sure you want to delete the analysis?",
+      onConfirm: () => {
+        removeSessionAnalysis(session.id);
+        setConfirmDialog((prev) => ({ ...prev, open: false }));
+      },
+    });
+  }
 
   function handleDeleteSession() {
-  setConfirmDialog({
-    open: true,
-    message: "Are you sure you want to delete this session?",
-    onConfirm: () => {
-      removeSession(session.id);
-      setConfirmDialog((prev) => ({ ...prev, open: false }));
-    }
-  });
-}
+    setConfirmDialog({
+      open: true,
+      message: "Are you sure you want to delete this session?",
+      onConfirm: () => {
+        removeSession(session.id);
+        setConfirmDialog((prev) => ({ ...prev, open: false }));
+      },
+    });
+  }
 
   return (
     <>
@@ -86,6 +86,7 @@ export default function SessionAnalysisActions({
         open={open}
         onClose={() => setOpen(false)}
         analysis={session.analysis}
+        title={session.name}
       />
       <ConfirmationDialog
         open={confirmDialog.open}

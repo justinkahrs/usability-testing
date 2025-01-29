@@ -87,13 +87,15 @@ export function SessionsProvider({ children }: { children: react.ReactNode }) {
   }, [sessions]);
 
   function addSession(name: string, tasks: TestingTask[]) {
+    const id = uuid();
     const newSession: Session = {
-      id: uuid(),
+      id,
       name,
       tasks,
       userTests: [],
     };
     setSessions((prevSessions) => [...prevSessions, newSession]);
+    return id;
   }
 
   function addUserTest(sessionId: string, userTest: UserTest) {
