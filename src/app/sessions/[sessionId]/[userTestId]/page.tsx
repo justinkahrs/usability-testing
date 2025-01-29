@@ -14,6 +14,7 @@ import BreadcrumbNav from "@/components/BreadcrumbNav";
 import UserTestTaskItem from "@/components/UserTestTaskItem";
 import TaskItem from "@/components/TaskItem";
 import { useState, useEffect } from "react";
+import RichTextInput from "@/components/RichTextInput";
 
 export default function UserTestDetailsPage() {
   const { sessionId, userTestId } = useParams();
@@ -24,6 +25,7 @@ export default function UserTestDetailsPage() {
   const [taskResults, setTaskResults] = useState<{
     [taskId: string]: { pass: boolean; comments: string };
   }>({});
+  const [generalComments, setGeneralComments] = useState("");
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -81,6 +83,7 @@ export default function UserTestDetailsPage() {
       setTitle(userTest.title || "");
       setDepartment(userTest.department || "");
       setDateOfTest(userTest.dateOfTest || "");
+      setGeneralComments(userTest.generalComments || "");
 
       const init: { [taskId: string]: { pass: boolean; comments: string } } =
         {};
@@ -141,6 +144,7 @@ export default function UserTestDetailsPage() {
       department,
       dateOfTest,
       taskResults: updatedResults,
+      generalComments,
     };
 
     updateUserTest(session.id, userTest.id, updatedUserTest);
@@ -180,20 +184,18 @@ export default function UserTestDetailsPage() {
 
         {editing && (
           <Stack spacing={2} mb={3}>
-            <Stack direction="row" spacing={2}>
-              <TextField
-                label="First Name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                fullWidth
-              />
-              <TextField
-                label="Last Name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                fullWidth
-              />
-            </Stack>
+            <TextField
+              label="First Name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              fullWidth
+            />
+            <TextField
+              label="Last Name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              fullWidth
+            />
             <TextField
               label="Title"
               value={title}
@@ -257,6 +259,20 @@ export default function UserTestDetailsPage() {
               );
             })}
           </Stack>
+        )}
+
+        <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
+          General Comments
+        </Typography>
+        {!editing && (
+          <RichTextInput value={userTest.generalComments || ""} readOnly />
+        )}
+        {editing && (
+          <RichTextInput
+            value={generalComments}
+            onChange={(val) => setGeneralComments(val)}
+            readOnly={false}
+          />
         )}
 
         <Stack direction="row" spacing={2} sx={{ mt: 4 }}>

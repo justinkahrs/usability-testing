@@ -15,6 +15,7 @@ interface RichTextInputProps {
 export default function RichTextInput({
   value,
   onChange,
+  height = "200px",
   readOnly = false,
   label,
 }: RichTextInputProps) {
@@ -36,13 +37,21 @@ export default function RichTextInput({
           {label}
         </Typography>
       )}
-      <ReactQuill
-        theme="snow"
-        value={value}
-        onChange={onChange}
-        readOnly={readOnly}
-        modules={modules}
-      />
+      <Box style={{ height: "200px" }}>
+        <ReactQuill
+          theme="snow"
+          value={value}
+          onChange={onChange}
+          readOnly={readOnly}
+          modules={modules}
+          style={{
+            height,
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        />
+      </Box>
     </Box>
   );
 }

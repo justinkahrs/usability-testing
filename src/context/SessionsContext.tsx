@@ -24,6 +24,7 @@ export interface UserTest {
     pass: boolean;
     comments: string;
   }>;
+  generalComments?: string;
 }
 
 export type Analysis = Record<string, unknown>;
