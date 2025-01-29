@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useEffect, useState, useRef /* type RefObject */ } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Box, IconButton, Stack } from "@mui/material";
 import ArrowBackIos from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIos from "@mui/icons-material/ArrowForwardIos";
-// import { TransitionGroup, CSSTransition } from "react-transition-group";
 import TaskItem from "./TaskItem";
 import type { TestingTask } from "@/context/SessionsContext";
 import UserTestTaskItem from "./UserTestTaskItem";
@@ -27,29 +26,18 @@ export default function TaskCarousel({
   onAllViewedChange,
 }: TaskCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  // const [direction, setDirection] = useState<"left" | "right">("left");
   const visitedRef = useRef<Set<number>>(new Set([0]));
-  // const nodeRefs = useRef<Record<string, RefObject<HTMLDivElement>>>({});
   const currentTask = tasks[currentIndex];
   const currentResult = taskResults[currentTask.id] || {
     pass: false,
     comments: "",
   };
 
-  // function getNodeRef(taskId: string) {
-  //   if (!nodeRefs.current[taskId]) {
-  //     nodeRefs.current[taskId] = React.createRef<HTMLDivElement>();
-  //   }
-  //   return nodeRefs.current[taskId];
-  // }
-
   const handlePrev = () => {
-    // setDirection("right");
     setCurrentIndex((prev) => (prev > 0 ? prev - 1 : tasks.length - 1));
   };
 
   const handleNext = () => {
-    // setDirection("left");
     setCurrentIndex((prev) => (prev < tasks.length - 1 ? prev + 1 : 0));
   };
 
@@ -71,17 +59,6 @@ export default function TaskCarousel({
         </IconButton>
 
         <Box flexGrow={1} sx={{ overflow: "hidden", position: "relative" }}>
-          {/* <TransitionGroup component={null}>
-            <CSSTransition
-              key={currentTask.id}
-              nodeRef={getNodeRef(currentTask.id)}
-              classNames={`slide-${direction}`}
-              timeout={300}
-            >
-              <Box
-                ref={getNodeRef(currentTask.id)}
-                sx={{ width: "100%", position: "absolute" }}
-              > */}
           {readOnly ? (
             <UserTestTaskItem
               key={currentTask.id}
@@ -99,9 +76,6 @@ export default function TaskCarousel({
               onCommentsChange={onCommentsChange}
             />
           )}
-          {/* </Box>
-            </CSSTransition>
-          </TransitionGroup> */}
         </Box>
 
         <IconButton onClick={handleNext}>
