@@ -82,9 +82,9 @@ export default function SessionDetailsPage() {
             updateSessionAnalysis={updateSessionAnalysis}
           />
         </Stack>
-        <Box flexGrow={1}>
+        <Stack sx={{ mb: 2 }}>
           <SessionTasksAccordion tasks={session.tasks} />
-        </Box>
+        </Stack>
         <Stack spacing={2}>
           {session.userTests.map((ut) => (
             <Card key={ut.id}>

@@ -18,14 +18,16 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-quill-new": "^3.3.3",
-    "uuid": "^11.0.5",
-    "react-transition-group": "^4.4.5"
+    "react-transition-group": "^4.4.5",
+    "turndown": "^7.1.2",
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/turndown": "^5.0.5",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
     "typescript": "^5"
