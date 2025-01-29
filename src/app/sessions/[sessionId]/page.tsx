@@ -14,6 +14,7 @@ import {
 import BreadcrumbNav from "@/components/BreadcrumbNav";
 import SessionAnalysisActions from "@/components/SessionAnalysisActions";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
+import SessionTasksAccordion from "@/components/SessionTasksAccordion";
 
 export default function SessionDetailsPage() {
   const [analysisToDelete, setAnalysisToDelete] = useState<string | null>(null);
@@ -63,16 +64,14 @@ export default function SessionDetailsPage() {
       />
       <Container component={Box} sx={{ p: 2 }}>
         <Typography variant="h4">{session.name}</Typography>
-        <Typography variant="subtitle1" marginBottom={2}>
-          {session.tasks.length} task(s)
-        </Typography>
-        <Stack direction="row" spacing={2} marginBottom={3}>
+        <Stack direction="row" spacing={2} marginBottom={3} alignItems="center">
           <Button
             variant="contained"
             onClick={() => router.push(`/sessions/${session.id}/new-user-test`)}
           >
             Add New User Test
           </Button>
+
           <SessionAnalysisActions
             session={session}
             removeSession={removeSession}
@@ -83,7 +82,9 @@ export default function SessionDetailsPage() {
             updateSessionAnalysis={updateSessionAnalysis}
           />
         </Stack>
-
+        <Box flexGrow={1}>
+          <SessionTasksAccordion tasks={session.tasks} />
+        </Box>
         <Stack spacing={2}>
           {session.userTests.map((ut) => (
             <Card key={ut.id}>
