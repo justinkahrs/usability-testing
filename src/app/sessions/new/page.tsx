@@ -39,16 +39,31 @@ export default function NewSessionPage() {
 
   // Example snippet for user reference
   const exampleMarkdown = `
-## Task 1: My Task Title
+# PMO Usability Testing Tasks
 
-**Scenario:**
-Describe the scenario or background context for this task.
+## Task 1: Locate Kaizen Workshop Information
 
-**Task:**
-Describe the user action(s) to be taken.
+### Scenario
+You are interested in learning more about Kaizen Workshops and how they can support organizational improvement within your unit.
 
-**Success Criteria:**
-Describe how success is measured for this task.
+### Task
+Navigate the website to find detailed information about Kaizen Workshops, including their purpose, format, or any upcoming sessions, and how to request this service.
+
+### Success Criteria
+User successfully uses the website navigation by going to **Services > Process Improvement > Kaizen Workshops**
+
+---
+
+## Task 2: Access the Strategy and Program Design Service Page
+
+### Scenario
+You are an organizational leader looking for services that help address complex challenges by diagnosing issues and creating long-term plans.
+
+### Task
+Find the section where you can learn about diagnosing organizational challenges and creating strategic plans or programs.
+
+### Success Criteria
+User navigates to **Strategy and Program Design** by going to **Services > Strategy and Program Design card**
 `;
 
   // Handle session creation
