@@ -3,6 +3,7 @@ import axios from "axios";
 import { Button } from "@mui/material";
 import type { Session } from "@/context/SessionsContext";
 import AnalysisDialog from "./AnalysisDialog";
+import ConfirmationDialog from "./ConfirmationDialog";
 
 type Props = {
   session: Session;
@@ -15,8 +16,13 @@ export default function SessionAnalysisActions({
   session,
   removeSession,
   removeSessionAnalysis,
-  updateSessionAnalysis,
+  updateSessionAnalysis
 }: Props) {
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    message: "",
+    onConfirm: () => {}
+  });
   const [open, setOpen] = useState(false);
 
   async function handleAnalysis() {
@@ -28,27 +34,38 @@ export default function SessionAnalysisActions({
         headers: { "Content-Type": "application/json" },
       });
       updateSessionAnalysis(session.id, responseData);
+      setOpen(true);
     } catch (_) {}
   }
 
   function handleDeleteAnalysis() {
-    if (window.confirm("Are you sure you want to delete the analysis?")) {
+  setConfirmDialog({
+    open: true,
+    message: "Are you sure you want to delete the analysis?",
+    onConfirm: () => {
       removeSessionAnalysis(session.id);
+      setConfirmDialog((prev) => ({ ...prev, open: false }));
     }
-  }
+  });
+}
 
   function handleDeleteSession() {
-    if (window.confirm("Are you sure you want to delete this session?")) {
+  setConfirmDialog({
+    open: true,
+    message: "Are you sure you want to delete this session?",
+    onConfirm: () => {
       removeSession(session.id);
+      setConfirmDialog((prev) => ({ ...prev, open: false }));
     }
-  }
+  });
+}
 
   return (
     <>
       <Button variant="outlined" onClick={handleAnalysis}>
         {session.analysis ? "Resubmit for Analysis" : "Submit for Analysis"}
       </Button>
-      {session.analysis && (
+      {session.analysis && Object.keys(session.analysis).length > 0 && (
         <>
           <Button variant="outlined" onClick={() => setOpen(true)}>
             View Analysis
@@ -69,6 +86,12 @@ export default function SessionAnalysisActions({
         open={open}
         onClose={() => setOpen(false)}
         analysis={session.analysis}
+      />
+      <ConfirmationDialog
+        open={confirmDialog.open}
+        onClose={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
+        onConfirm={confirmDialog.onConfirm}
+        message={confirmDialog.message}
       />
     </>
   );

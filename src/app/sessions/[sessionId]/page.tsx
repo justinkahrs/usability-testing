@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useSessions } from "@/context/SessionsContext";
 import {
@@ -12,11 +13,21 @@ import {
 } from "@mui/material";
 import BreadcrumbNav from "@/components/BreadcrumbNav";
 import SessionAnalysisActions from "@/components/SessionAnalysisActions";
+import ConfirmationDialog from "@/components/ConfirmationDialog";
 
 export default function SessionDetailsPage() {
+  const [analysisToDelete, setAnalysisToDelete] = useState<string | null>(null);
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [userTestToDelete, setUserTestToDelete] = useState<string | null>(null);
+  const [openUserTestConfirm, setOpenUserTestConfirm] = useState(false);
   const { sessionId } = useParams();
-  const { sessions, removeSession, removeUserTest, updateSessionAnalysis } =
-    useSessions();
+  const {
+    sessions,
+    removeSession,
+    removeSessionAnalysis,
+    removeUserTest,
+    updateSessionAnalysis,
+  } = useSessions();
   const router = useRouter();
 
   const session = sessions.find((s) => s.id === sessionId);
@@ -66,11 +77,8 @@ export default function SessionDetailsPage() {
             session={session}
             removeSession={removeSession}
             removeSessionAnalysis={(id) => {
-              if (
-                window.confirm("Are you sure you want to delete the analysis?")
-              ) {
-                removeSessionAnalysis(id);
-              }
+              setAnalysisToDelete(id);
+              setOpenConfirm(true);
             }}
             updateSessionAnalysis={updateSessionAnalysis}
           />
@@ -106,7 +114,10 @@ export default function SessionDetailsPage() {
                   <Button
                     variant="outlined"
                     color="error"
-                    onClick={() => removeUserTest(session.id, ut.id)}
+                    onClick={() => {
+                      setUserTestToDelete(ut.id);
+                      setOpenUserTestConfirm(true);
+                    }}
                   >
                     Delete
                   </Button>
@@ -119,6 +130,32 @@ export default function SessionDetailsPage() {
           )}
         </Stack>
       </Container>
+      <ConfirmationDialog
+        open={openConfirm}
+        onClose={() => setOpenConfirm(false)}
+        onConfirm={() => {
+          if (analysisToDelete) {
+            removeSessionAnalysis(analysisToDelete);
+            setAnalysisToDelete(null);
+          }
+          setOpenConfirm(false);
+        }}
+        title="Delete Analysis"
+        message="Are you sure you want to delete the analysis?"
+      />
+      <ConfirmationDialog
+        open={openUserTestConfirm}
+        onClose={() => setOpenUserTestConfirm(false)}
+        onConfirm={() => {
+          if (userTestToDelete) {
+            removeUserTest(session.id, userTestToDelete);
+            setUserTestToDelete(null);
+          }
+          setOpenUserTestConfirm(false);
+        }}
+        title="Delete User Test"
+        message="Are you sure you want to delete this user test?"
+      />
     </>
   );
 }
