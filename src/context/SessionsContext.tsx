@@ -27,7 +27,14 @@ export interface UserTest {
   generalComments?: string;
 }
 
-export type Analysis = Record<string, unknown>;
+export type Analysis = {
+  overallPassRate?: string;
+  tasks?: Array<{
+    taskId: string;
+    title: string;
+    passRate: string;
+  }>;
+};
 
 export type Session = {
   id: string;

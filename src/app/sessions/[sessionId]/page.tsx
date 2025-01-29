@@ -15,6 +15,7 @@ import BreadcrumbNav from "@/components/BreadcrumbNav";
 import SessionAnalysisActions from "@/components/SessionAnalysisActions";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 import SessionTasksAccordion from "@/components/SessionTasksAccordion";
+import UserTestCard from "@/components/UserTestCard";
 
 export default function SessionDetailsPage() {
   const [analysisToDelete, setAnalysisToDelete] = useState<string | null>(null);
@@ -87,44 +88,17 @@ export default function SessionDetailsPage() {
         </Stack>
         <Stack spacing={2}>
           {session.userTests.map((ut) => (
-            <Card key={ut.id}>
-              <CardContent>
-                <Typography variant="h6">
-                  {ut.firstName} {ut.lastName}
-                </Typography>
-                <Typography variant="body2">
-                  {ut.title} - {ut.department}
-                </Typography>
-                <Typography variant="body2">
-                  Tested on: {ut.dateOfTest}
-                </Typography>
-                <Typography variant="body2">
-                  {ut.taskResults.filter((t) => t.pass).length} /{" "}
-                  {session.tasks.length} passed
-                </Typography>
-
-                <Stack direction="row" spacing={1} mt={2}>
-                  <Button
-                    variant="outlined"
-                    onClick={() =>
-                      router.push(`/sessions/${session.id}/${ut.id}`)
-                    }
-                  >
-                    View
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={() => {
-                      setUserTestToDelete(ut.id);
-                      setOpenUserTestConfirm(true);
-                    }}
-                  >
-                    Delete
-                  </Button>
-                </Stack>
-              </CardContent>
-            </Card>
+            <UserTestCard
+              key={ut.id}
+              sessionId={session.id}
+              userTest={ut}
+              totalTasks={session.tasks.length}
+              onView={(sid, utid) => router.push(`/sessions/${sid}/${utid}`)}
+              onDelete={(utid) => {
+                setUserTestToDelete(utid);
+                setOpenUserTestConfirm(true);
+              }}
+            />
           ))}
           {session.userTests.length === 0 && (
             <Typography variant="body2">No user tests yet.</Typography>

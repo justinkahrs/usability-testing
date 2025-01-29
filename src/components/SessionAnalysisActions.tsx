@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { Button } from "@mui/material";
-import type { Session } from "@/context/SessionsContext";
+import type { Analysis, Session } from "@/context/SessionsContext";
 import AnalysisDialog from "./AnalysisDialog";
 import ConfirmationDialog from "./ConfirmationDialog";
 
@@ -9,7 +9,7 @@ type Props = {
   session: Session;
   removeSession: (sessionId: string) => void;
   removeSessionAnalysis: (sessionId: string) => void;
-  updateSessionAnalysis: (sessionId: string, analysis: any) => void;
+  updateSessionAnalysis: (sessionId: string, analysis: Analysis) => void;
 };
 
 export default function SessionAnalysisActions({
