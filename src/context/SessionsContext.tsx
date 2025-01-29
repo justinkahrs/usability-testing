@@ -173,7 +173,6 @@ export function SessionsProvider({ children }: { children: React.ReactNode }) {
   async function updateSessionAnalysis(sessionId: string, analysis: Analysis) {
     increment();
     try {
-      await axios.post("/api/analysis", { sessionId, analysis });
       setSessions((p) =>
         p.map((s) => (s.id === sessionId ? { ...s, analysis } : s))
       );

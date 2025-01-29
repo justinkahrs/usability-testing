@@ -4,6 +4,7 @@ import { Button } from "@mui/material";
 import type { Analysis, Session } from "@/context/SessionsContext";
 import AnalysisDialog from "./AnalysisDialog";
 import ConfirmationDialog from "./ConfirmationDialog";
+import { useRouter } from "next/navigation";
 
 type Props = {
   session: Session;
@@ -24,6 +25,7 @@ export default function SessionAnalysisActions({
     onConfirm: () => {},
   });
   const [open, setOpen] = useState(false);
+  const router = useRouter();
 
   async function handleAnalysis() {
     try {
@@ -56,6 +58,7 @@ export default function SessionAnalysisActions({
       onConfirm: () => {
         removeSession(session.id);
         setConfirmDialog((prev) => ({ ...prev, open: false }));
+        router.push("/sessions");
       },
     });
   }

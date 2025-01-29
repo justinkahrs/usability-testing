@@ -153,7 +153,36 @@ export default function UserTestDetailsPage() {
     updateUserTest(session.id, userTest.id, updatedUserTest);
     setEditing(false);
   }
+  const ActionButtons = () => (
+    <Stack direction="row" spacing={2} sx={{ mb: 2, mt: 2 }}>
+      {!editing && (
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setEditing(true)}
+        >
+          Edit
+        </Button>
+      )}
 
+      {!editing && (
+        <Button variant="contained" color="error" onClick={handleDelete}>
+          Delete Test
+        </Button>
+      )}
+
+      {editing && (
+        <>
+          <Button variant="outlined" onClick={() => setEditing(false)}>
+            Cancel
+          </Button>
+          <Button variant="contained" color="primary" onClick={handleSave}>
+            Save Changes
+          </Button>
+        </>
+      )}
+    </Stack>
+  );
   return (
     <>
       <BreadcrumbNav
@@ -165,6 +194,7 @@ export default function UserTestDetailsPage() {
         ]}
       />
       <Container maxWidth="md" sx={{ mt: 4 }}>
+        <ActionButtons />
         <Typography variant="h5" gutterBottom>
           User Test Details
         </Typography>
@@ -221,7 +251,6 @@ export default function UserTestDetailsPage() {
             />
           </Stack>
         )}
-
         <Typography variant="h6" gutterBottom>
           Task Results
         </Typography>
@@ -307,49 +336,7 @@ export default function UserTestDetailsPage() {
             readOnly={false}
           />
         )}
-
-        <Stack direction="row" spacing={2} sx={{ mt: 4 }}>
-          {!editing && (
-            <Button
-              variant="outlined"
-              onClick={() => router.push(`/sessions/${session.id}`)}
-            >
-              Back
-            </Button>
-          )}
-
-          {!editing && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => setEditing(true)}
-            >
-              Edit
-            </Button>
-          )}
-
-          {!editing && (
-            <Button variant="contained" color="error" onClick={handleDelete}>
-              Delete Test
-            </Button>
-          )}
-
-          {editing && (
-            <>
-              <Button variant="outlined" onClick={() => setEditing(false)}>
-                Cancel
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSave}
-                disabled={viewMode === "carousel" && !allTasksViewed}
-              >
-                Save Changes
-              </Button>
-            </>
-          )}
-        </Stack>
+        <ActionButtons />
       </Container>
     </>
   );
