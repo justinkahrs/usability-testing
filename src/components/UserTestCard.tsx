@@ -84,18 +84,18 @@ export default function UserTestCard({
           </IconButton>
           <Menu anchorEl={anchorEl} open={open} onClose={handleMenuClose}>
             <MenuItem
-              onClick={() => {
+              onClick={(e) => {
                 onView(sessionId, userTest.id);
-                handleMenuClose();
+                handleMenuClose(e);
               }}
             >
               <VisibilityIcon fontSize="small" sx={{ mr: 1 }} />
               View
             </MenuItem>
             <MenuItem
-              onClick={() => {
+              onClick={(e) => {
                 onDelete(userTest.id);
-                handleMenuClose();
+                handleMenuClose(e);
               }}
             >
               <DeleteIcon fontSize="small" sx={{ mr: 1 }} />

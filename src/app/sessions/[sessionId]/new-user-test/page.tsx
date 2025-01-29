@@ -23,7 +23,10 @@ export default function NewUserTestPage() {
   const [lastName, setLastName] = useState("");
   const [title, setTitle] = useState("");
   const [department, setDepartment] = useState("");
-  const [dateOfTest, setDateOfTest] = useState("");
+  const [dateOfTest, setDateOfTest] = useState(() => {
+    const today = new Date().toISOString().split("T")[0];
+    return today;
+  });
   const [taskResults, setTaskResults] = useState<{
     [taskId: string]: { pass: boolean; comments: string };
   }>({});
@@ -117,25 +120,33 @@ export default function NewUserTestPage() {
         </Typography>
 
         <Stack spacing={2} mb={3}>
-          <TextField
-            label="First Name"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-          />
-          <TextField
-            label="Last Name"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-          />
+          <Stack direction="row" spacing={2}>
+            <TextField
+              label="First Name"
+              fullWidth
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              size="small"
+            />
+            <TextField
+              label="Last Name"
+              fullWidth
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              size="small"
+            />
+          </Stack>
           <TextField
             label="Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            size="small"
           />
           <TextField
             label="Department"
             value={department}
             onChange={(e) => setDepartment(e.target.value)}
+            size="small"
           />
           <TextField
             type="date"
@@ -143,6 +154,7 @@ export default function NewUserTestPage() {
             InputLabelProps={{ shrink: true }}
             value={dateOfTest}
             onChange={(e) => setDateOfTest(e.target.value)}
+            size="small"
           />
         </Stack>
 

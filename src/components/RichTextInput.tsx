@@ -6,6 +6,7 @@ import "react-quill-new/dist/quill.snow.css";
 import { Box, Typography } from "@mui/material";
 
 interface RichTextInputProps {
+  height?: string;
   value: string;
   onChange?: (value: string) => void;
   readOnly?: boolean;
@@ -15,7 +16,7 @@ interface RichTextInputProps {
 export default function RichTextInput({
   value,
   onChange,
-  height = "200px",
+  height = "150px",
   readOnly = false,
   label,
 }: RichTextInputProps) {
@@ -37,7 +38,7 @@ export default function RichTextInput({
           {label}
         </Typography>
       )}
-      <Box style={{ height: "200px" }}>
+      <Box style={{ height }}>
         <ReactQuill
           theme="snow"
           value={value}

@@ -2,15 +2,7 @@
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useSessions } from "@/context/SessionsContext";
-import {
-  Box,
-  Button,
-  Container,
-  Card,
-  CardContent,
-  Typography,
-  Stack,
-} from "@mui/material";
+import { Box, Button, Container, Typography, Stack } from "@mui/material";
 import BreadcrumbNav from "@/components/BreadcrumbNav";
 import SessionAnalysisActions from "@/components/SessionAnalysisActions";
 import ConfirmationDialog from "@/components/ConfirmationDialog";

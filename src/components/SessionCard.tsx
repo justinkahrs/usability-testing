@@ -115,7 +115,9 @@ export default function SessionCard({
           <Box flex={1} pl={2}>
             <Typography variant="subtitle2">Analysis</Typography>
             <Typography variant="body2" color="text.secondary">
-              {session.analysis || "No details provided."}
+              {session.analysis
+                ? session.analysis.overallPassRate
+                : "No details provided."}
             </Typography>
           </Box>
         </Box>
