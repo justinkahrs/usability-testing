@@ -16,6 +16,15 @@ import BreadcrumbNav from "@/components/BreadcrumbNav";
 import TaskItem from "@/components/TaskItem";
 
 export default function NewUserTestPage() {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [title, setTitle] = useState("");
+  const [department, setDepartment] = useState("");
+  const [dateOfTest, setDateOfTest] = useState("");
+  const [taskResults, setTaskResults] = useState<{
+    [taskId: string]: { pass: boolean; comments: string };
+  }>({});
+
   const { sessionId } = useParams();
   const { sessions, addUserTest } = useSessions();
   const router = useRouter();
@@ -30,15 +39,7 @@ export default function NewUserTestPage() {
 
   const session = sessions.find((s) => s.id === sessionId);
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [title, setTitle] = useState("");
-  const [department, setDepartment] = useState("");
-  const [dateOfTest, setDateOfTest] = useState("");
   // A local state object to track pass/fail and comments for each task
-  const [taskResults, setTaskResults] = useState<{
-    [taskId: string]: { pass: boolean; comments: string };
-  }>({});
 
   if (!session) {
     return (

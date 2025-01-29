@@ -11,6 +11,7 @@ import {
   Stack,
 } from "@mui/material";
 import { TestingTask } from "@/context/SessionsContext";
+import RichTextInput from "./RichTextInput";
 
 interface TaskItemProps {
   task: TestingTask;
@@ -62,13 +63,11 @@ export default function TaskItem({
           <Typography>Pass</Typography>
         </Stack>
 
-        <TextField
-          fullWidth
-          multiline
-          minRows={3}
+        <RichTextInput
           label="Comments"
           value={commentsValue}
-          onChange={(e) => onCommentsChange(task.id, e.target.value)}
+          onChange={(val) => onCommentsChange(task.id, val)}
+          readOnly={false}
         />
       </CardContent>
     </Card>

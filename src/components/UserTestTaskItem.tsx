@@ -1,7 +1,8 @@
 "use client";
 
-import { Card, CardContent, Typography, Stack, Chip, TextField } from "@mui/material";
-import { TestingTask } from "@/context/SessionsContext";
+import { Card, CardContent, Typography, Stack, Chip } from "@mui/material";
+import type { TestingTask } from "@/context/SessionsContext";
+import RichTextInput from "./RichTextInput";
 
 interface UserTestTaskItemProps {
   task: TestingTask;
@@ -9,7 +10,11 @@ interface UserTestTaskItemProps {
   comments: string;
 }
 
-export default function UserTestTaskItem({ task, pass, comments }: UserTestTaskItemProps) {
+export default function UserTestTaskItem({
+  task,
+  pass,
+  comments,
+}: UserTestTaskItemProps) {
   return (
     <Card variant="outlined">
       <CardContent>
@@ -43,14 +48,7 @@ export default function UserTestTaskItem({ task, pass, comments }: UserTestTaskI
           />
         </Stack>
 
-        <TextField
-          fullWidth
-          multiline
-          InputProps={{ readOnly: true }}
-          minRows={3}
-          label="Comments"
-          value={comments}
-        />
+        <RichTextInput label="Comments" value={comments} readOnly />
       </CardContent>
     </Card>
   );
