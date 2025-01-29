@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { useSessions } from "@/context/SessionsContext";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import {
   Box,
+  Container,
   Button,
   Card,
   CardContent,
@@ -13,7 +12,7 @@ import {
   Stack,
 } from "@mui/material";
 import BreadcrumbNav from "@/components/BreadcrumbNav";
-import AnalysisDialog from "@/components/AnalysisDialog";
+import SessionAnalysisActions from "@/components/SessionAnalysisActions";
 
 export default function SessionsPage() {
   const {
@@ -23,8 +22,6 @@ export default function SessionsPage() {
     updateSessionAnalysis,
   } = useSessions();
   const router = useRouter();
-  const [analysisDialogOpen, setAnalysisDialogOpen] = useState(false);
-  const [analysisToShow, setAnalysisToShow] = useState<any>(null);
 
   if (sessions === null) {
     return (
@@ -39,7 +36,7 @@ export default function SessionsPage() {
       <BreadcrumbNav
         crumbs={[{ label: "Home", href: "/" }, { label: "Sessions" }]}
       />
-      <Box sx={{ p: 2 }}>
+      <Container component={Box} sx={{ p: 2 }}>
         <Typography variant="h4" gutterBottom>
           Sessions
         </Typography>
@@ -71,67 +68,12 @@ export default function SessionsPage() {
                   >
                     View
                   </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={async () => {
-                      try {
-                        const { analysis, ...sessionToSend } = session;
-                        const {
-                          data: { responseData },
-                        } = await axios.post("/api/analysis", sessionToSend, {
-                          headers: { "Content-Type": "application/json" },
-                        });
-                        updateSessionAnalysis(session.id, responseData);
-                      } catch (err) {
-                        console.error("Error submitting analysis:", err);
-                      }
-                    }}
-                  >
-                    {session.analysis
-                      ? "Resubmit for Analysis"
-                      : "Submit for Analysis"}
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={() => {
-                      setAnalysisToShow(session.analysis);
-                      setAnalysisDialogOpen(true);
-                    }}
-                  >
-                    View Analysis
-                  </Button>
-                  {session.analysis && (
-                    <Button
-                      variant="outlined"
-                      color="warning"
-                      onClick={() => {
-                        if (
-                          window.confirm(
-                            "Are you sure you want to delete the analysis?"
-                          )
-                        ) {
-                          removeSessionAnalysis(session.id);
-                        }
-                      }}
-                    >
-                      Delete Analysis
-                    </Button>
-                  )}
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={() => {
-                      if (
-                        window.confirm(
-                          "Are you sure you want to delete this session?"
-                        )
-                      ) {
-                        removeSession(session.id);
-                      }
-                    }}
-                  >
-                    Delete
-                  </Button>
+                  <SessionAnalysisActions
+                    session={session}
+                    removeSession={removeSession}
+                    removeSessionAnalysis={removeSessionAnalysis}
+                    updateSessionAnalysis={updateSessionAnalysis}
+                  />
                 </Stack>
               </CardContent>
             </Card>
@@ -140,12 +82,7 @@ export default function SessionsPage() {
             <Typography variant="body1">No sessions yet.</Typography>
           )}
         </Stack>
-      </Box>
-      <AnalysisDialog
-        open={analysisDialogOpen}
-        onClose={() => setAnalysisDialogOpen(false)}
-        analysis={analysisToShow}
-      />
+      </Container>
     </>
   );
 }

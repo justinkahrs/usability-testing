@@ -5,7 +5,6 @@ const theme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         "@global": {
-          /* Slide from left to right */
           ".slide-left-enter": {
             transform: "translateX(100%)",
           },
@@ -20,8 +19,6 @@ const theme = createTheme({
             transform: "translateX(-100%)",
             transition: "transform 300ms ease-out",
           },
-
-          /* Slide from right to left */
           ".slide-right-enter": {
             transform: "translateX(-100%)",
           },
@@ -38,6 +35,16 @@ const theme = createTheme({
           }
         }
       }
+    },
+    MuiContainer: {
+      variants: [
+        {
+          props: { variant: "padded" },
+          style: ({ theme }) => ({
+            padding: theme.spacing(2)
+          })
+        }
+      ]
     }
   }
 });

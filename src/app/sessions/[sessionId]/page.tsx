@@ -1,33 +1,23 @@
 "use client";
-import { useState } from "react";
-import axios from "axios";
 import { useRouter, useParams } from "next/navigation";
 import { useSessions } from "@/context/SessionsContext";
 import {
   Box,
   Button,
+  Container,
   Card,
   CardContent,
   Typography,
   Stack,
 } from "@mui/material";
 import BreadcrumbNav from "@/components/BreadcrumbNav";
-import AnalysisDialog from "@/components/AnalysisDialog";
+import SessionAnalysisActions from "@/components/SessionAnalysisActions";
 
 export default function SessionDetailsPage() {
   const { sessionId } = useParams();
   const { sessions, removeSession, removeUserTest, updateSessionAnalysis } =
     useSessions();
   const router = useRouter();
-  const [analysisDialogOpen, setAnalysisDialogOpen] = useState(false);
-
-  if (sessions === null) {
-    return (
-      <Box sx={{ p: 2 }}>
-        <Typography variant="h5">Loading sessions...</Typography>
-      </Box>
-    );
-  }
 
   const session = sessions.find((s) => s.id === sessionId);
 
@@ -38,10 +28,10 @@ export default function SessionDetailsPage() {
           crumbs={[
             { label: "Home", href: "/" },
             { label: "Sessions", href: "/sessions" },
-            session ? { label: session.name } : { label: "Session" },
+            { label: "Session" },
           ]}
         />
-        <Box sx={{ p: 2 }}>
+        <Box component="div" marginTop={2}>
           <Typography variant="h5">Session not found.</Typography>
           <Button sx={{ mt: 2 }} onClick={() => router.push("/sessions")}>
             Go Back
@@ -60,85 +50,31 @@ export default function SessionDetailsPage() {
           { label: session.name },
         ]}
       />
-      <Box sx={{ p: 2 }}>
+      <Container component={Box} sx={{ p: 2 }}>
         <Typography variant="h4">{session.name}</Typography>
-        <Typography variant="subtitle1" sx={{ mb: 2 }}>
+        <Typography variant="subtitle1" marginBottom={2}>
           {session.tasks.length} task(s)
         </Typography>
-        <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
+        <Stack direction="row" spacing={2} marginBottom={3}>
           <Button
             variant="contained"
             onClick={() => router.push(`/sessions/${session.id}/new-user-test`)}
           >
             Add New User Test
           </Button>
-          <Button
-            variant="outlined"
-            onClick={async () => {
-              try {
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const { analysis, ...sessionToSend } = session;
-                const {
-                  data: { responseData },
-                } = await axios.post("/api/analysis", sessionToSend, {
-                  headers: { "Content-Type": "application/json" },
-                });
-                console.warn("response: ", responseData);
-                updateSessionAnalysis(session.id, responseData);
-                console.log("Analysis request sent successfully!");
-              } catch (err) {
-                console.error("Error submitting analysis:", err);
-              }
-            }}
-          >
-            {session.analysis ? "Resubmit for Analysis" : "Submit for Analysis"}
-          </Button>
-          {session.analysis && (
-            <>
-              <Button
-                variant="outlined"
-                onClick={() => setAnalysisDialogOpen(true)}
-              >
-                View Analysis
-              </Button>
-              <Button
-                variant="outlined"
-                color="warning"
-                onClick={() => {
-                  if (
-                    window.confirm(
-                      "Are you sure you want to delete the analysis?"
-                    )
-                  ) {
-                    removeSessionAnalysis(session.id);
-                  }
-                }}
-              >
-                Delete Analysis
-              </Button>
-            </>
-          )}
-          <Button
-            variant="outlined"
-            color="error"
-            onClick={() => {
-              // Confirm deletion
+          <SessionAnalysisActions
+            session={session}
+            removeSession={removeSession}
+            removeSessionAnalysis={(id) => {
               if (
-                window.confirm("Are you sure you want to delete this session?")
+                window.confirm("Are you sure you want to delete the analysis?")
               ) {
-                removeSession(session.id);
-                router.push("/sessions");
+                removeSessionAnalysis(id);
               }
             }}
-          >
-            Delete Session
-          </Button>
+            updateSessionAnalysis={updateSessionAnalysis}
+          />
         </Stack>
-        <AnalysisDialog
-          open={analysisDialogOpen}
-          onClose={() => setAnalysisDialogOpen(false)}
-          analysis={session.analysis}
-        />
 
         <Stack spacing={2}>
           {session.userTests.map((ut) => (
@@ -182,7 +118,7 @@ export default function SessionDetailsPage() {
             <Typography variant="body2">No user tests yet.</Typography>
           )}
         </Stack>
-      </Box>
+      </Container>
     </>
   );
 }

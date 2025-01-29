@@ -1,0 +1,75 @@
+import { useState } from "react";
+import axios from "axios";
+import { Button } from "@mui/material";
+import type { Session } from "@/context/SessionsContext";
+import AnalysisDialog from "./AnalysisDialog";
+
+type Props = {
+  session: Session;
+  removeSession: (sessionId: string) => void;
+  removeSessionAnalysis: (sessionId: string) => void;
+  updateSessionAnalysis: (sessionId: string, analysis: any) => void;
+};
+
+export default function SessionAnalysisActions({
+  session,
+  removeSession,
+  removeSessionAnalysis,
+  updateSessionAnalysis,
+}: Props) {
+  const [open, setOpen] = useState(false);
+
+  async function handleAnalysis() {
+    try {
+      const { analysis, ...sessionToSend } = session;
+      const {
+        data: { responseData },
+      } = await axios.post("/api/analysis", sessionToSend, {
+        headers: { "Content-Type": "application/json" },
+      });
+      updateSessionAnalysis(session.id, responseData);
+    } catch (_) {}
+  }
+
+  function handleDeleteAnalysis() {
+    if (window.confirm("Are you sure you want to delete the analysis?")) {
+      removeSessionAnalysis(session.id);
+    }
+  }
+
+  function handleDeleteSession() {
+    if (window.confirm("Are you sure you want to delete this session?")) {
+      removeSession(session.id);
+    }
+  }
+
+  return (
+    <>
+      <Button variant="outlined" onClick={handleAnalysis}>
+        {session.analysis ? "Resubmit for Analysis" : "Submit for Analysis"}
+      </Button>
+      {session.analysis && (
+        <>
+          <Button variant="outlined" onClick={() => setOpen(true)}>
+            View Analysis
+          </Button>
+          <Button
+            variant="outlined"
+            color="warning"
+            onClick={handleDeleteAnalysis}
+          >
+            Delete Analysis
+          </Button>
+        </>
+      )}
+      <Button variant="outlined" color="error" onClick={handleDeleteSession}>
+        Delete Session
+      </Button>
+      <AnalysisDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        analysis={session.analysis}
+      />
+    </>
+  );
+}
