@@ -29,6 +29,7 @@ export default function SessionAnalysisActions({
 
   async function handleAnalysis() {
     try {
+      // eslint-disable-next-line
       const { analysis, ...sessionToSend } = session;
       const {
         data: { responseData },
@@ -37,7 +38,9 @@ export default function SessionAnalysisActions({
       });
       updateSessionAnalysis(session.id, responseData);
       setOpen(true);
-    } catch (_) {}
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   function handleDeleteAnalysis() {

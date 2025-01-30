@@ -1,5 +1,11 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography } from "@mui/material";
-import { ReactNode } from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Typography,
+} from "@mui/material";
 
 type ConfirmationDialogProps = {
   open: boolean;
@@ -18,7 +24,7 @@ export default function ConfirmationDialog({
   title = "Confirm Action",
   message = "Are you sure?",
   confirmText = "Confirm",
-  cancelText = "Cancel"
+  cancelText = "Cancel",
 }: ConfirmationDialogProps) {
   return (
     <Dialog open={open} onClose={onClose}>

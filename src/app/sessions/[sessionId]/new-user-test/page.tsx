@@ -88,17 +88,24 @@ export default function NewUserTestPage() {
       title,
       department,
       dateOfTest,
-      taskResults: session.tasks.map((task) => {
-        const tr = taskResults[task.id] || { pass: false, comments: "" };
-        return {
-          taskId: task.id,
-          pass: tr.pass,
-          comments: tr.comments,
-        };
-      }),
+      taskResults: session
+        ? session.tasks.map((task) => {
+            const tr = taskResults[task.id] || { pass: false, comments: "" };
+            return {
+              taskId: task.id,
+              pass: tr.pass,
+              comments: tr.comments,
+            };
+          })
+        : [],
       generalComments,
     };
-    addUserTest(sessionId, userTest);
+    if (typeof sessionId === "string") {
+      addUserTest(sessionId, userTest);
+      router.push(`/sessions/${sessionId}`);
+    } else {
+      console.error("Invalid sessionId:", sessionId);
+    }
     router.push(`/sessions/${sessionId}`);
   }
 

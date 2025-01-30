@@ -32,21 +32,21 @@ const theme = createTheme({
           ".slide-right-exit-active": {
             transform: "translateX(100%)",
             transition: "transform 300ms ease-out",
-          }
-        }
-      }
+          },
+        },
+      },
     },
     MuiContainer: {
       variants: [
         {
-          props: { variant: "padded" },
+          props: {},
           style: ({ theme }) => ({
-            padding: theme.spacing(2)
-          })
-        }
-      ]
-    }
-  }
+            padding: theme.spacing(2),
+          }),
+        },
+      ],
+    },
+  },
 });
 
 export default theme;

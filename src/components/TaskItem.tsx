@@ -1,16 +1,7 @@
 "use client";
 
-import {
-  Box,
-  Card,
-  CardContent,
-  FormControlLabel,
-  Switch,
-  TextField,
-  Typography,
-  Stack,
-} from "@mui/material";
-import { TestingTask } from "@/context/SessionsContext";
+import { Card, CardContent, Switch, Typography, Stack } from "@mui/material";
+import type { TestingTask } from "@/context/SessionsContext";
 import RichTextInput from "./RichTextInput";
 
 interface TaskItemProps {

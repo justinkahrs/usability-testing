@@ -1,6 +1,5 @@
 "use client";
 
-import type { ReactNode } from "react";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { SessionsProvider } from "@/context/SessionsContext";
 import { LoadingProvider } from "@/context/LoadingContext";

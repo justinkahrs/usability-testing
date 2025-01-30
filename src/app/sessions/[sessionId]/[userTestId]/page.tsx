@@ -10,12 +10,14 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
+import { useState, useEffect, useMemo } from "react";
+
 import BreadcrumbNav from "@/components/BreadcrumbNav";
 import UserTestTaskItem from "@/components/UserTestTaskItem";
 import TaskItem from "@/components/TaskItem";
-import { useState, useEffect } from "react";
 import RichTextInput from "@/components/RichTextInput";
 import TaskCarousel from "@/components/TaskCarousel";
+import type { UserTest } from "@/context/SessionsContext";
 
 export default function UserTestDetailsPage() {
   const { sessionId, userTestId } = useParams();
@@ -28,13 +30,37 @@ export default function UserTestDetailsPage() {
   }>({});
   const [generalComments, setGeneralComments] = useState("");
   const [viewMode, setViewMode] = useState<"list" | "carousel">("list");
-  const [allTasksViewed, setAllTasksViewed] = useState(true);
+  const [, setAllTasksViewed] = useState(true);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [title, setTitle] = useState("");
   const [department, setDepartment] = useState("");
   const [dateOfTest, setDateOfTest] = useState("");
+
+  const session = sessions?.find((s) => s.id === sessionId);
+  const userTest = session?.userTests?.find((ut) => ut.id === userTestId);
+
+  const userTestTaskResults = useMemo(() => {
+    return Array.isArray(userTest?.taskResults) ? userTest.taskResults : [];
+  }, [userTest?.taskResults]);
+
+  useEffect(() => {
+    if (!userTest) return;
+
+    setFirstName(userTest.firstName || "");
+    setLastName(userTest.lastName || "");
+    setTitle(userTest.title || "");
+    setDepartment(userTest.department || "");
+    setDateOfTest(userTest.dateOfTest || "");
+    setGeneralComments(userTest.generalComments || "");
+
+    const init: { [taskId: string]: { pass: boolean; comments: string } } = {};
+    for (const t of userTestTaskResults) {
+      init[t.taskId] = { pass: t.pass, comments: t.comments };
+    }
+    setTaskResults(init);
+  }, [userTest, userTestTaskResults]);
 
   if (sessions === null) {
     return (
@@ -43,8 +69,6 @@ export default function UserTestDetailsPage() {
       </Box>
     );
   }
-
-  const session = sessions.find((s) => s.id === sessionId);
 
   if (!session) {
     return (
@@ -56,8 +80,6 @@ export default function UserTestDetailsPage() {
       </Box>
     );
   }
-
-  const userTest = session.userTests.find((ut) => ut.id === userTestId);
 
   if (!userTest) {
     return (
@@ -73,33 +95,11 @@ export default function UserTestDetailsPage() {
     );
   }
 
-  // Ensure userTest.taskResults is always an array
-  if (!Array.isArray(userTest.taskResults)) {
-    userTest.taskResults = [];
-  }
-
-  // Initialize local state from the existing userTest.taskResults
-  useEffect(() => {
-    if (userTest) {
-      setFirstName(userTest.firstName || "");
-      setLastName(userTest.lastName || "");
-      setTitle(userTest.title || "");
-      setDepartment(userTest.department || "");
-      setDateOfTest(userTest.dateOfTest || "");
-      setGeneralComments(userTest.generalComments || "");
-
-      const init: { [taskId: string]: { pass: boolean; comments: string } } =
-        {};
-      userTest.taskResults.forEach((t) => {
-        init[t.taskId] = { pass: t.pass, comments: t.comments };
-      });
-      setTaskResults(init);
-    }
-  }, [userTest]);
-
   function handleDelete() {
-    removeUserTest(session.id, userTest.id);
-    router.push(`/sessions/${session.id}`);
+    if (session && userTest) {
+      removeUserTest(session.id, userTest.id);
+      router.push(`/sessions/${session.id}`);
+    }
   }
 
   function handleToggle(taskId: string) {
@@ -107,10 +107,7 @@ export default function UserTestDetailsPage() {
       const oldVal = prev[taskId] || { pass: false, comments: "" };
       return {
         ...prev,
-        [taskId]: {
-          ...oldVal,
-          pass: !oldVal.pass,
-        },
+        [taskId]: { ...oldVal, pass: !oldVal.pass },
       };
     });
   }
@@ -120,27 +117,31 @@ export default function UserTestDetailsPage() {
       const oldVal = prev[taskId] || { pass: false, comments: "" };
       return {
         ...prev,
-        [taskId]: {
-          ...oldVal,
-          comments,
-        },
+        [taskId]: { ...oldVal, comments },
       };
     });
   }
 
   function handleSave() {
     // Convert our local state into the proper array form
-    const updatedResults = session.tasks.map((task) => {
-      const tr = taskResults[task.id] || { pass: false, comments: "" };
-      return {
-        taskId: task.id,
-        pass: tr.pass,
-        comments: tr.comments,
-      };
-    });
+    const updatedResults: Array<{
+      taskId: string;
+      pass: boolean;
+      comments: string;
+    }> = session
+      ? session.tasks.map((task) => {
+          const tr = taskResults[task.id] || { pass: false, comments: "" };
+          return {
+            taskId: task.id,
+            pass: tr.pass,
+            comments: tr.comments,
+          };
+        })
+      : [];
 
-    const updatedUserTest = {
-      ...userTest,
+    const updatedUserTest: UserTest = {
+      ...(userTest || {}), // Provide a default empty object if userTest is undefined
+      id: userTest?.id || "", // Ensure id is a string
       firstName,
       lastName,
       title,
@@ -150,39 +151,46 @@ export default function UserTestDetailsPage() {
       generalComments,
     };
 
-    updateUserTest(session.id, userTest.id, updatedUserTest);
+    if (session && userTest) {
+      updateUserTest(session.id, userTest.id, updatedUserTest);
+    }
     setEditing(false);
   }
-  const ActionButtons = () => (
-    <Stack direction="row" spacing={2} sx={{ mb: 2, mt: 2 }}>
-      {!editing && (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setEditing(true)}
-        >
-          Edit
-        </Button>
-      )}
 
-      {!editing && (
-        <Button variant="contained" color="error" onClick={handleDelete}>
-          Delete Test
-        </Button>
-      )}
+  // We can define a small sub-component for the action buttons:
+  function ActionButtons() {
+    return (
+      <Stack direction="row" spacing={2} sx={{ mb: 2, mt: 2 }}>
+        {!editing && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setEditing(true)}
+          >
+            Edit
+          </Button>
+        )}
 
-      {editing && (
-        <>
-          <Button variant="outlined" onClick={() => setEditing(false)}>
-            Cancel
+        {!editing && (
+          <Button variant="contained" color="error" onClick={handleDelete}>
+            Delete Test
           </Button>
-          <Button variant="contained" color="primary" onClick={handleSave}>
-            Save Changes
-          </Button>
-        </>
-      )}
-    </Stack>
-  );
+        )}
+
+        {editing && (
+          <>
+            <Button variant="outlined" onClick={() => setEditing(false)}>
+              Cancel
+            </Button>
+            <Button variant="contained" color="primary" onClick={handleSave}>
+              Save Changes
+            </Button>
+          </>
+        )}
+      </Stack>
+    );
+  }
+
   return (
     <>
       <BreadcrumbNav
@@ -195,10 +203,13 @@ export default function UserTestDetailsPage() {
       />
       <Container maxWidth="md" sx={{ mt: 4 }}>
         <ActionButtons />
+
         <Typography variant="h5" gutterBottom>
           User Test Details
         </Typography>
-        {!editing && (
+
+        {/* Display user info */}
+        {!editing ? (
           <Stack spacing={1} mb={3}>
             <Typography variant="body1">
               <strong>Name:</strong> {userTest.firstName} {userTest.lastName}
@@ -213,9 +224,7 @@ export default function UserTestDetailsPage() {
               <strong>Date of Test:</strong> {userTest.dateOfTest}
             </Typography>
           </Stack>
-        )}
-
-        {editing && (
+        ) : (
           <Stack spacing={2} mb={3}>
             <TextField
               label="First Name"
@@ -251,6 +260,8 @@ export default function UserTestDetailsPage() {
             />
           </Stack>
         )}
+
+        {/* Task Results */}
         <Typography variant="h6" gutterBottom>
           Task Results
         </Typography>
@@ -280,7 +291,7 @@ export default function UserTestDetailsPage() {
           <Stack spacing={2}>
             {session.tasks.map((task) => {
               if (!editing) {
-                const tr = userTest.taskResults.find(
+                const tr = userTestTaskResults.find(
                   (t) => t.taskId === task.id
                 );
                 return (
@@ -326,14 +337,12 @@ export default function UserTestDetailsPage() {
         <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
           General Comments
         </Typography>
-        {!editing && (
+        {!editing ? (
           <RichTextInput value={userTest.generalComments || ""} readOnly />
-        )}
-        {editing && (
+        ) : (
           <RichTextInput
             value={generalComments}
             onChange={(val) => setGeneralComments(val)}
-            readOnly={false}
           />
         )}
         <ActionButtons />

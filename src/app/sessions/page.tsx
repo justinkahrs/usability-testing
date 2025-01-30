@@ -2,13 +2,7 @@
 
 import { useSessions } from "@/context/SessionsContext";
 import { useRouter } from "next/navigation";
-import {
-  Box,
-  Container,
-  Button,
-  Typography,
-  Stack,
-} from "@mui/material";
+import { Box, Container, Button, Typography, Stack } from "@mui/material";
 import BreadcrumbNav from "@/components/BreadcrumbNav";
 import SessionCard from "@/components/SessionCard";
 

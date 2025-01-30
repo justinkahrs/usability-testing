@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { v4 as uuid } from "uuid";
-import axios from "axios";
 import { useLoading } from "./LoadingContext";
 
 export interface TestingTask {
@@ -58,7 +57,7 @@ interface SessionsContextType {
   ) => void;
   removeSession: (sessionId: string) => void;
   removeSessionAnalysis: (sessionId: string) => void;
-  updateSessionAnalysis: (sessionId: string, analysis: Analysis) => void;
+  updateSessionAnalysis: (sessionId: string, analysis?: Analysis) => void;
 }
 
 const SessionsContext = React.createContext<SessionsContextType>({
@@ -170,7 +169,7 @@ export function SessionsProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
-  async function updateSessionAnalysis(sessionId: string, analysis: Analysis) {
+  async function updateSessionAnalysis(sessionId: string, analysis?: Analysis) {
     increment();
     try {
       setSessions((p) =>

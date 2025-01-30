@@ -13,13 +13,13 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AssessmentIcon from "@mui/icons-material/Assessment";
-import type { Session } from "@/context/SessionsContext";
+import type { Analysis, Session } from "@/context/SessionsContext";
 
 interface SessionCardProps {
   session: Session;
   removeSession: (sessionId: string) => void;
   removeSessionAnalysis: (sessionId: string) => void;
-  updateSessionAnalysis: (sessionId: string) => void;
+  updateSessionAnalysis: (sessionId: string, analysis?: Analysis) => void;
   onView: (sessionId: string) => void;
 }
 
