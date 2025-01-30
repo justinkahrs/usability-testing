@@ -78,6 +78,9 @@ export default function SessionDetailsPage() {
         <Stack sx={{ mb: 2 }}>
           <SessionTasksAccordion tasks={session.tasks} />
         </Stack>
+        <Typography sx={{ mb: 2 }} variant="h5">
+          {`(${session.userTests.length})`} Testers
+        </Typography>
         <Stack spacing={2}>
           {session.userTests.map((ut) => (
             <UserTestCard
