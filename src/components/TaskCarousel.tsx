@@ -46,6 +46,9 @@ export default function TaskCarousel({
     onAllViewedChange?.(visitedRef.current.size === tasks.length);
   }, [currentIndex, tasks.length, onAllViewedChange]);
 
+  if (!currentTask) {
+    return;
+  }
   return (
     <Box>
       <Stack
