@@ -44,15 +44,17 @@ export default function TaskItem({
           </Typography>
         )}
 
-        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-          <Typography>Fail</Typography>
-          <Switch
-            checked={passValue}
-            onChange={() => onToggle(task.id)}
-            color={passValue ? "success" : "error"}
-          />
-          <Typography>Pass</Typography>
-        </Stack>
+        {task.successCriteria && (
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+            <Typography>Fail</Typography>
+            <Switch
+              checked={passValue}
+              onChange={() => onToggle(task.id)}
+              color={passValue ? "success" : "error"}
+            />
+            <Typography>Pass</Typography>
+          </Stack>
+        )}
 
         <RichTextInput
           label="Comments"

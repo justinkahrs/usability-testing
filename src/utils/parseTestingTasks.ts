@@ -17,7 +17,7 @@ export function parseTestingTasks(markdown: string): TestingTask[] {
       title: title.trim(),
       scenario,
       instructions,
-      successCriteria,
+      successCriteria: successCriteria || undefined,
     });
   }
   return tasks;

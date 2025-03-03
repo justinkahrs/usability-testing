@@ -87,7 +87,7 @@ export default function SessionDetailsPage() {
               key={ut.id}
               sessionId={session.id}
               userTest={ut}
-              totalTasks={session.tasks.length}
+              totalTasks={session.tasks.filter((t) => t.successCriteria).length}
               onView={(sid, utid) => router.push(`/sessions/${sid}/${utid}`)}
               onDelete={(utid) => {
                 setUserTestToDelete(utid);

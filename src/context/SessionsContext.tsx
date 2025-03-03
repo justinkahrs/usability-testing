@@ -10,7 +10,7 @@ export interface TestingTask {
   title: string;
   scenario: string;
   instructions: string;
-  successCriteria: string;
+  successCriteria?: string;
 }
 
 export interface UserTest {
@@ -22,7 +22,7 @@ export interface UserTest {
   dateOfTest: string;
   taskResults: Array<{
     taskId: string;
-    pass: boolean;
+    pass?: boolean;
     comments: string;
   }>;
   generalComments?: string;

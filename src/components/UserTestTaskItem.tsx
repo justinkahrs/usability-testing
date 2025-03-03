@@ -40,13 +40,15 @@ export default function UserTestTaskItem({
           </Typography>
         )}
 
-        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-          <Chip
-            label={pass ? "Pass" : "Fail"}
-            color={pass ? "success" : "error"}
-            variant="filled"
-          />
-        </Stack>
+        {task.successCriteria && (
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+            <Chip
+              label={pass ? "Pass" : "Fail"}
+              color={pass ? "success" : "error"}
+              variant="filled"
+            />
+          </Stack>
+        )}
 
         <RichTextInput label="Comments" value={comments} readOnly />
       </CardContent>

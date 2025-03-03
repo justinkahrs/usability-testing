@@ -42,12 +42,14 @@ export default function SessionTasksAccordion({
                 </Typography>
                 {task.instructions}
               </Typography>
-              <Typography>
-                <Typography component={"span"} fontWeight="bold">
-                  Success Criteria:
+              {task.successCriteria && (
+                <Typography>
+                  <Typography component={"span"} fontWeight="bold">
+                    Success Criteria:
+                  </Typography>
+                  {task.successCriteria}
                 </Typography>
-                {task.successCriteria}
-              </Typography>
+              )}
             </AccordionDetails>
           </Accordion>
         ))}
