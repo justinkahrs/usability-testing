@@ -21,7 +21,8 @@ interface AnalysisDialogProps {
         tasks?: Array<{
           taskId: string;
           title: string;
-          passRate: string; // "100.00%"
+          passRate: string; // "100.00%",
+          comments?: Array<string>;
         }>;
       }
     | null
@@ -118,6 +119,25 @@ export default function AnalysisDialog({
                 <Typography variant="body2">
                   Pass Rate: {task.passRate}
                 </Typography>
+                {task.comments &&
+                  task.comments.filter((comment) => comment !== "").length >
+                    0 && (
+                    <>
+                      <Typography variant="body2">Comments:</Typography>
+                      <ul style={{ paddingLeft: 20 }}>
+                        {task.comments &&
+                          task.comments.length > 0 &&
+                          task.comments.map(
+                            (comment) =>
+                              comment && (
+                                <li key={comment}>
+                                  <Typography>{comment}</Typography>
+                                </li>
+                              )
+                          )}
+                      </ul>
+                    </>
+                  )}
               </Box>
             ))}
           </Stack>
